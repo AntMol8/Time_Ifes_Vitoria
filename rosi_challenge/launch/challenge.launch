@@ -1,0 +1,16 @@
+<launch>
+
+	<!-- running the rosi joystick example node -->
+	<node name="fire_detection_script" pkg="rosi_challenge" type="fire_detection.py" respawn="true"/>
+	
+	<node name="hokuyo_script" pkg="rosi_challenge" type="hokuyo.py" respawn="true"/>
+	
+	<node name="map_script" pkg="rosi_challenge" type="mapa.py" respawn="true"/>
+
+	<node name="movement_script" pkg="rosi_challenge" type="movement.py" respawn="true"/>
+	
+	<node name="obj_detect_script" pkg="rosi_challenge" type="obj_dect.py" respawn="true"/>
+	
+	
+
+</launch>
