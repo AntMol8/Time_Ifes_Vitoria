@@ -108,8 +108,8 @@ def callback(datas):
 						elif total_g != 0 and dist_esc/total < 2800:
 							dest_x_global = dest_x_global/total_g
 							dest_y_global = dest_y_global/total_g
-							rospy.loginfo("Stair.")
-							rospy.loginfo("X: %f Y: %f", dest_x_global, dest_y_global)
+							#rospy.loginfo("Stair.")
+							#rospy.loginfo("X: %f Y: %f", dest_x_global, dest_y_global)
 							total_g = 0
 							dest_x = 0
 							dest_y = 0
@@ -126,8 +126,8 @@ def callback(datas):
 						elif total_g != 0 and dist_media/total < 1850:
 							dest_x_global = dest_x_global/total_g
 							dest_y_global = dest_y_global/total_g
-							rospy.loginfo("Object with void.")
-							rospy.loginfo("X: %f Y: %f", dest_x_global, dest_y_global)
+							#rospy.loginfo("Object with void.")
+							#rospy.loginfo("X: %f Y: %f", dest_x_global, dest_y_global)
 							total_g = 0
 							dest_x = 0
 							dest_y = 0
@@ -144,8 +144,8 @@ def callback(datas):
 							dest_y_global = dest_y_global/total_g
 							if abs(dest_y_global) >= 4:
 								dest_y_global = 3.5
-							rospy.loginfo("Obstacle.")	
-							rospy.loginfo("X: %f Y: %f", dest_x_global, dest_y_global)
+							#rospy.loginfo("Obstacle.")	
+							#rospy.loginfo("X: %f Y: %f", dest_x_global, dest_y_global)
 							total_g = 0
 							dest_x = 0
 							dest_y = 0
