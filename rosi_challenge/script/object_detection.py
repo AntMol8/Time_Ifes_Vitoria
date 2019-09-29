@@ -155,7 +155,7 @@ def callback(datas):
 			rospy.signal_shutdown('FIM')
 
 def listener():
-	rospy.init_node('object_detection')
+	rospy.init_node('obj_detect_script')
 	rospy.Subscriber('/sensor/gps', NavSatFix, GPS)
 	rospy.Subscriber('/sensor/kinect_depth', Image, callback)
 	rospy.spin()
