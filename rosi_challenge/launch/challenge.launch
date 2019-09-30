@@ -13,7 +13,7 @@
 	
 	<node name="obj_detect_script" pkg="rosi_challenge" type="object_detection.py" respawn="true"/>
 	
-	<node name="roll_detect_script" pkg"rosi_challenge" type="detect_roll.py" respawn="true"/>
+	<node name="roll_detect_script" pkg="rosi_challenge" type="detect_roll.py" respawn="true"/>
 	
 	
 
