@@ -150,9 +150,9 @@ def callback(datas):
 							dest_x = 0
 							dest_y = 0
 							
-		if cv2.waitKey(1) & 0xFF == ord('q'):
-	    		cv2.destroyAllWindows()
-			rospy.signal_shutdown('FIM')
+		#if cv2.waitKey(1) & 0xFF == ord('q'):
+	    	#	cv2.destroyAllWindows()
+		#	rospy.signal_shutdown('FIM')
 
 def listener():
 	rospy.init_node('obj_detect_script')
