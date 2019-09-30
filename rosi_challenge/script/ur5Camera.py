@@ -15,10 +15,10 @@ def callback(datas):
 	mask = cv2.morphologyEx(binary, cv2.MORPH_CLOSE, cv2.getStructuringElement(cv2.MORPH_RECT, (3, 50)))
 	
 	#cv2.imshow('binary', binary)
-	cv2.waitKey(1)
+	#cv2.waitKey(1)
 	
 	#cv2.imshow('mask', mask)
-	cv2.waitKey(1)
+	#cv2.waitKey(1)
 	
 	cnt = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)[-2]
 	
