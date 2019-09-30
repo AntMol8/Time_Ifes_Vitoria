@@ -24,12 +24,13 @@ def callback(datas):
 	
 	if len(cnt) > 0:
 		#print("FOGO")
+		#send fire message
 
-	for i in cnt:
+	'''for i in cnt:
 		x, y, w, h = cv2.boundingRect(i)
 		px, py = x + (w // 2), y + ((4 * h) // 5)
 		img[py-1: py+1, px-1: px+1] = [0, 255, 0]
-		cv2.rectangle(img, (x, y),(x + w, y + h),(0, 255, 0), 2)
+		cv2.rectangle(img, (x, y),(x + w, y + h),(0, 255, 0), 2)'''
 
 	#cv2.imshow('img', img)
 	#if cv2.waitKey(1) & 0xFF == ord('q'):
