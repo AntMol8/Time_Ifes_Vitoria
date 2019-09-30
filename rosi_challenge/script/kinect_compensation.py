@@ -27,7 +27,7 @@ def callback(data):
 	if(quat_to_radians2 < -math.pi/4):
 		quat_to_radians2 = math.pi/4 
 		
-	print(quat_to_radians2*-1)
+	#print(quat_to_radians2*-1)
 	
 	angle.publish(quat_to_radians2*-1)
 	
