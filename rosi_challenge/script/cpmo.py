@@ -77,12 +77,12 @@ def GPS(data):
 	print goals
 	print len(goals)
 	
-	if(index==13 and gps_x>-51.5):
+	if(index==15 and gps_x>-51.5):
 		index -= 1
 		goals.pop(index)
 		processando = 0
 	
-	if(index==5 and gps_x>-14):
+	if(index==7 and gps_x>-14):
 		index -= 1
 		goals.pop(index)
 		processando = 0
