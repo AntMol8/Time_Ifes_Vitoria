@@ -27,6 +27,8 @@ The map is a 6000x1000 image named 'mapa.png'. After the execution of the progra
 	
 	- Red - Fire 
 	
+	- Blue - Robot's trajectory
+	
 	- White - Conveyor Belt (esteira)
 	
 	- Black - Ground / Out of bounds
