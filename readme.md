@@ -7,7 +7,8 @@ This repository contains the package to perform the ROSI CHALLENGE using ROS ope
 	2) Compile your catkin_ws using catkin build
 	3) Open terminal and run roscore and vrep in order
 	4) Open challenge_scenario.ttt on vrep
-	5) Insert on the terminal $ roslaunch rosi_challenge challenge.launch
+	5) Do a chmod a+x on all script files (Example: $ chmod a+x movement.py)
+	6) Insert on the terminal $ roslaunch rosi_challenge challenge.launch
 
 ## What it does
 The launch package is composed of 5 scripts, that are:
