@@ -26,7 +26,7 @@ Receives the parameters of a function from 'rosim' and publishes coordinates, sp
 
 Receives coordinates from 'cpmo' and publishes the parameters of a hiberbolic function to 'rosi_joy' so it can control the robot's movement.
 
-- ### 5proof_of_concept_control: 
+- ### proof_of_concept_control: 
 
 Is controlled by cpmo and determines the angular position of the UR5, also regulating the action of touching parts of the conveyor belt.
 			
