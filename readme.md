@@ -43,5 +43,7 @@ The map is a 6000x1000 image named 'mapa.png'. After the execution of the progra
 	- White - Conveyor Belt (esteira)
 	
 	- Black - Ground / Out of bounds
+	
+	- Dashed - ROSI trajectory
 
 		
