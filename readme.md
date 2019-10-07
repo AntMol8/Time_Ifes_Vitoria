@@ -25,11 +25,11 @@ This repository contains the package to perform the ROSI CHALLENGE using ROS ope
 		5proof_of_concept_control:
 			Is controlled by cpmo and determines the angular position of the UR5, also regulating the action of touching parts of the conveyor belt.
 *Map
-		The map is a 6000x1000 image named 'mapa.png'. After the execution of the program, the image can be found in either the Home folder or in the .ros folder:
+			The map is a 6000x1000 image named 'mapa.png'. After the execution of the program, the image can be found in either the Home folder or in the .ros folder:
 		
-		Map Legend:
-			Red - Fire 
-			White - Conveyor Belt (esteira)
-			Black - Ground / Out of bounds
+			Map Legend:
+				Red - Fire 
+				White - Conveyor Belt (esteira)
+				Black - Ground / Out of bounds
 
 		
