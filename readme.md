@@ -1,13 +1,13 @@
-*ROSI CHALLENGE - TIME_IFES_VITORIA
+# h1 ROSI CHALLENGE - TIME_IFES_VITORIA
 This repository contains the package to perform the ROSI CHALLENGE using ROS operational system and V-REP as a simulator. It was developed on Python 2.7 and may not work in other versions.
 
-*How to install and running
+# h2 How to install and running
 	The installation and running can be done by the following steps:		
 	1) Clone and download the repository package in the <catkin_ws>/src/ folder
 	2) Compile your catkin_ws using catkin build
 	3) Run the file challenge.launch
 
-*What it does
+# h2 What it does
 	The launch package is composed of 5 scripts, that are:
 
 		movement:
@@ -24,7 +24,7 @@ This repository contains the package to perform the ROSI CHALLENGE using ROS ope
 
 		5proof_of_concept_control:
 			Is controlled by cpmo and determines the angular position of the UR5, also regulating the action of touching parts of the conveyor belt.
-*Map
+# h2 Map
 			The map is a 6000x1000 image named 'mapa.png'. After the execution of the program, the image can be found in either the Home folder or in the .ros folder:
 		
 			Map Legend:
