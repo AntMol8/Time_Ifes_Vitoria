@@ -3,13 +3,13 @@
 	<!-- running the rosi joystick example node -->
 	<node name="movement_script" pkg="rosi_challenge" type="movement.py" respawn="true"/>
 	
-	<node name="proof_of_concept_control_script" pkg="rosi_challenge" type="proof_of_concept_control.py" respawn="true"/>
+	<node name="proof_of_concept_control_script" pkg="rosi_challenge" type="ur5_control.py" respawn="true"/>
 	
-	<node name="cpmo_script" pkg="rosi_challenge" type="cpmo.py" respawn="true"/>
+	<node name="cpmo_script" pkg="rosi_challenge" type="main_control.py" respawn="true"/>
 
-	<node name="rosi_joy_script" pkg="rosi_challenge" type="rosi_joy.py" respawn="true"/>
+	<node name="rosi_joy_script" pkg="rosi_challenge" type="trajectory_parameters.py" respawn="true"/>
 	
-	<node name="rosim_script" pkg="rosi_challenge" type="rosim.py" respawn="true"/>
+	<node name="rosim_script" pkg="rosi_challenge" type="create_trajectory.py" respawn="true"/>
 	
 	
 

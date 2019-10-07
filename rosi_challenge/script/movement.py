@@ -7,14 +7,17 @@ from sensor_msgs.msg import NavSatFix
 from rosi_defy.msg import RosiMovementArray
 from rosi_defy.msg import RosiMovement
 from PIL import Image as IMG
+import cv2
 
-mapa = np.zeros([6000, 1000], dtype = np.uint8)
-mapa[..., 500] = 255
+mapa = np.zeros([6000, 1000, 3], dtype = np.uint8) #coordenadas da esteira ---------vvvvvv, depois coloco
+x1=int(-51.825*100+6000); x2=int(-2.15*100+6000)
+y1=int(1.245*100+500);y2=int(-1.425*100+500)
+cv2.rectangle(mapa, (y2, x2), (y1, x1), (255, 255, 255), -1)
 x_gps, y_gps, z_gps = 0.0, 0.0, 0.0
-x_ref, y_ref = -0,-2
+x_ref, y_ref = -10,-2.2
 back_arms_angle = 0
 front_arms_angle = 35
-speed = 0
+speed = 2
 #angle_reference = 0
 horizontal_reference_gps = 1
 z_quaternion_reference_gps =0
@@ -133,9 +136,12 @@ def Imuu(Imu_data):
 	mapa_y = int(y/resolucao) + 500
 	
 	if (mapa_x < 6000 and mapa_x >= 0) and (mapa_y < 1000 and mapa_y >= 0):
-		mapa[mapa_x,mapa_y] = 255
-		imagem = IMG.fromarray(mapa, 'L')
-		imagem.save('caminho.png', "PNG")
+		if (abs(x_gps + 45.8) <= 0.1) and y_gps<0 and y_gps>-2:
+			cv2.rectangle(mapa, (int(-45.8/resolucao) + 6000-5, int(1/resolucao) + 500-5), (int(-45.8/resolucao) + 6000+5, int(1/resolucao) + 500+5), (0, 0, 255), -1)
+		if (abs(x_gps + 5.975) <= 0.1) and y_gps<0:
+			cv2.rectangle(mapa, (int(-1.275/resolucao) + 500 - 5, int(-5.975/resolucao) + 6000 - 5), (int(-1.275/resolucao) + 500 +5, int(-5.975/resolucao) + 6000+5), (0, 0, 255), -1)
+		mapa[mapa_x,mapa_y] = (255, 255, 255)
+		cv2.imwrite('mapa.png', mapa)
 
 	b = Imu_data.orientation.x
 	c = Imu_data.orientation.y
@@ -228,3 +234,4 @@ if __name__ == '__main__':
         talker()
     except rospy.ROSInterruptException:
         pass
+
