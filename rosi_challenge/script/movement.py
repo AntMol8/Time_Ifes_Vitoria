@@ -137,7 +137,7 @@ def Imuu(Imu_data):
 	
 	if (mapa_x < 6000 and mapa_x >= 0) and (mapa_y < 1000 and mapa_y >= 0):
 		if (abs(x_gps + 45.8) <= 0.1) and y_gps<0 and y_gps>-2:
-			cv2.rectangle(mapa, (int(-45.8/resolucao) + 6000-5, int(1/resolucao) + 500-5), (int(-45.8/resolucao) + 6000+5, int(1/resolucao) + 500+5), (0, 0, 255), -1)
+			cv2.rectangle(mapa, (int(1/resolucao) + 500-5, int(-45.8/resolucao) + 6000-5), (int(1/resolucao) + 500+5, int(-45.8/resolucao) + 6000+5), (0, 0, 255), -1)
 		if (abs(x_gps + 5.975) <= 0.1) and y_gps<0:
 			cv2.rectangle(mapa, (int(-1.275/resolucao) + 500 - 5, int(-5.975/resolucao) + 6000 - 5), (int(-1.275/resolucao) + 500 +5, int(-5.975/resolucao) + 6000+5), (0, 0, 255), -1)
 		mapa[mapa_x,mapa_y] = (255, 255, 255)
