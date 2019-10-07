@@ -33,7 +33,7 @@ Is controlled by cpmo and determines the angular position of the UR5, also regul
 ## Map
 The map is a 6000x1000 image named 'mapa.png'. After the execution of the program, the image can be found in either the Home folder or in the .ros folder:
 		
-- Map Legend:
+- ### Map Legend:
 	
 	- Red - Fire 
 	
