@@ -14,19 +14,19 @@ The launch package is composed of 5 scripts, that are:
 
 Gets coordinates of where the robot should go in a straight line by linking the robot's position and its objective, the angle of the joints of the wheels and the robot's speed and transforms it into movement by a proportional closed control system. Generates map, marking the fires' positions and displaying it in red color.
 		
-- ### cpmo.py: 
+- ### main_control.py: 
 
 Commands other functions of the robot, enabling and disabling parts of other scripts in order to perform the tasks intended.
 
-- ### rosi_joy.py: 
+- ### trajectory_parameters.py: 
 
 Receives the parameters of a function from 'rosim' and publishes coordinates, speed and wheel angle to 'movement' with the objective of making it perform a hyperbolical tangent trajectory when making bypassing and object.
 
-- ### rosim.py: 
+- ### create_trajectory.py: 
 
 Receives coordinates from 'cpmo' and publishes the parameters of a hiberbolic function to 'rosi_joy' so it can control the robot's movement.
 
-- ### proof_of_concept_control.py: 
+- ### ur5_control.py: 
 
 Is controlled by cpmo and determines the angular position of the UR5, also regulating the action of touching parts of the conveyor belt.
 			
