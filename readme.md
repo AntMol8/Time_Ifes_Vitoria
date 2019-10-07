@@ -10,34 +10,25 @@ This repository contains the package to perform the ROSI CHALLENGE using ROS ope
 ## What it does
 The launch package is composed of 5 scripts, that are:
 
-- movement:
-- Gets coordinates of where the robot should go in a straight line by linking the robot's position and its objective, the angle of the joints of the wheels and the robot's speed and transforms it into movement by a proportional closed control system. Generates map, marking the fires' positions and displaying it in red color.
+- movement: Gets coordinates of where the robot should go in a straight line by linking the robot's position and its objective, the angle of the joints of the wheels and the robot's speed and transforms it into movement by a proportional closed control system. Generates map, marking the fires' positions and displaying it in red color.
 		
-- cpmo:
-	
-	Commands other functions of the robot, enabling and disabling parts of other scripts in order to perform the tasks intended.
+- cpmo: Commands other functions of the robot, enabling and disabling parts of other scripts in order to perform the tasks intended.
 
-- rosi_joy:
-	
-	Receives the parameters of a function from 'rosim' and publishes coordinates, speed and wheel angle to 'movement' with the objective of making it perform a hyperbolical tangent trajectory when making bypassing and object.
+- rosi_joy: Receives the parameters of a function from 'rosim' and publishes coordinates, speed and wheel angle to 'movement' with the objective of making it perform a hyperbolical tangent trajectory when making bypassing and object.
 
-- rosim:
-	
-	Receives coordinates from 'cpmo' and publishes the parameters of a hiberbolic function to 'rosi_joy' so it can control the robot's movement.
+- rosim: Receives coordinates from 'cpmo' and publishes the parameters of a hiberbolic function to 'rosi_joy' so it can control the robot's movement.
 
-- 5proof_of_concept_control:
-	
-	Is controlled by cpmo and determines the angular position of the UR5, also regulating the action of touching parts of the conveyor belt.
+- 5proof_of_concept_control: Is controlled by cpmo and determines the angular position of the UR5, also regulating the action of touching parts of the conveyor belt.
 			
 ## Map
 The map is a 6000x1000 image named 'mapa.png'. After the execution of the program, the image can be found in either the Home folder or in the .ros folder:
 		
 - Map Legend:
 	
-	Red - Fire 
+	- Red - Fire 
 	
-	White - Conveyor Belt (esteira)
+	- White - Conveyor Belt (esteira)
 	
-	Black - Ground / Out of bounds
+	- Black - Ground / Out of bounds
 
 		
