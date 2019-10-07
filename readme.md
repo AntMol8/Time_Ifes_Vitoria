@@ -5,7 +5,9 @@ This repository contains the package to perform the ROSI CHALLENGE using ROS ope
 	The installation and running can be done by the following steps:		
 	1) Clone and download the repository package in the <catkin_ws>/src/
 	2) Compile your catkin_ws using catkin build
-	3) 
+	3) Open terminal and run roscore and vrep in order
+	4) Open challenge_scenario.ttt
+	5) Insert on the terminal $ roslaunch rosi_defy
 
 ## What it does
 The launch package is composed of 5 scripts, that are:
