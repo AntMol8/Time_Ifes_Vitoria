@@ -1,6 +1,5 @@
 <launch>
 
-	<!-- running the rosi joystick example node -->
 	<node name="movement_script" pkg="rosi_challenge" type="movement.py" respawn="true"/>
 	
 	<node name="ur5_control_script" pkg="rosi_challenge" type="ur5_control.py" respawn="true"/>
