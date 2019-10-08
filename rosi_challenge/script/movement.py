@@ -9,9 +9,9 @@ from rosi_defy.msg import RosiMovement
 from PIL import Image as IMG
 import cv2
 
-mapa = np.zeros([6000, 1000, 3], dtype = np.uint8) #coordenadas da esteira ---------vvvvvv, depois coloco
+mapa = np.zeros([6000, 1200, 3], dtype = np.uint8) #coordenadas da esteira ---------vvvvvv, depois coloco
 x1=int(-51.825*100+6000); x2=int(-2.15*100+6000)
-y1=int(1.245*100+500);y2=int(-1.425*100+500)
+y1=int(1.245*100+600);y2=int(-1.425*100+600)
 cv2.rectangle(mapa, (y2, x2), (y1, x1), (255, 255, 255), -1)
 x_gps, y_gps, z_gps = 0.0, 0.0, 0.0
 x_ref, y_ref = -10,-2.2
@@ -133,14 +133,15 @@ def Imuu(Imu_data):
 	feedback = rospy.Publisher('/rosi/command_traction_speed', RosiMovementArray, queue_size = 1)
 	resolucao = 0.01
 	mapa_x = int(x/resolucao) + 6000 
-	mapa_y = int(y/resolucao) + 500
+	mapa_y = int(y/resolucao) + 600
 	
-	if (mapa_x < 6000 and mapa_x >= 0) and (mapa_y < 1000 and mapa_y >= 0):
-		if (abs(x_gps + 45.8) <= 0.1) and y_gps<0 and y_gps>-2:
-			cv2.rectangle(mapa, (int(1/resolucao) + 500-5, int(-45.8/resolucao) + 6000-5), (int(1/resolucao) + 500+5, int(-45.8/resolucao) + 6000+5), (0, 0, 255), -1)
-		if (abs(x_gps + 5.975) <= 0.1) and y_gps<0:
-			cv2.rectangle(mapa, (int(-1.275/resolucao) + 500 - 5, int(-5.975/resolucao) + 6000 - 5), (int(-1.275/resolucao) + 500 +5, int(-5.975/resolucao) + 6000+5), (0, 0, 255), -1)
-		mapa[mapa_x,mapa_y] = (255, 255, 255)
+	if (mapa_x < 6000 and mapa_x >= 0) and (mapa_y < 1200 and mapa_y >= 0):
+		if (abs(x_gps + 45.8) <= 0.1) and (0 < y_gps < 2):
+			cv2.rectangle(mapa, (int(1/resolucao) + 600 - 10, int(-45.8/resolucao) + 6000 - 10), (int(1/resolucao) + 600 + 10, int(-45.8/resolucao) + 6000 + 10), (0, 0, 255), -1)
+		elif (abs(x_gps + 5.975) <= 0.1) and y_gps < 0:
+			cv2.rectangle(mapa, (int(-1.275/resolucao) + 600 - 10, int(-5.975/resolucao) + 6000 - 10), (int(-1.275/resolucao) + 600 + 10, int(-5.975/resolucao) + 6000 + 10), (0, 0, 255), -1)
+			
+		mapa[mapa_x,mapa_y] = (255, 0, 0)
 		cv2.imwrite('mapa.png', mapa)
 
 	b = Imu_data.orientation.x
