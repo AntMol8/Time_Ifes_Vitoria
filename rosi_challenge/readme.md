@@ -44,6 +44,6 @@ The map is a 6000x1000 image named 'mapa.png'. After the execution of the progra
 	
 	- Black - Ground / Out of bounds
 	
-	- Dashed Line - ROSI trajectory
+	- Blue - ROSI trajectory
 
 		
