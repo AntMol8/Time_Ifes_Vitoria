@@ -8,7 +8,7 @@ This repository contains the package to perform the ROSI CHALLENGE using ROS ope
 	3) Open terminal and run roscore and vrep in order
 	4) Open challenge_scenario.ttt on vrep
 	5) Go to the scripts folder and run the chmod +x command on all script files (Example: $ chmod +x *.py)
-	6) Insert on the terminal $ roslaunch rosi_challenge challenge.launch
+	6) Insert on the terminal $ roslaunch Time_Ifes_Vitoria challenge.launch
 
 ## What it does
 The launch package is composed of 5 scripts, that are:
