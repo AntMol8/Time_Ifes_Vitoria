@@ -1,0 +1,13 @@
+<launch>
+
+	<node name="movement_script" pkg="Time_Ifes_Vitoria" type="movement.py" respawn="true"/>
+	
+	<node name="ur5_control_script" pkg="Time_Ifes_Vitoria" type="ur5_control.py" respawn="true"/>
+	
+	<node name="main_control_script" pkg="Time_Ifes_Vitoria" type="main_control.py" respawn="true"/>
+
+	<node name="trajectory_parameters_script" pkg="Time_Ifes_Vitoria" type="trajectory_parameters.py" respawn="true"/>
+	
+	<node name="create_trajectory_script" pkg="Time_Ifes_Vitoria" type="create_trajectory.py" respawn="true"/>
+
+</launch>
