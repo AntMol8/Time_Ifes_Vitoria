@@ -22,7 +22,7 @@ speed = 2
 horizontal_reference_gps = 1
 z_quaternion_reference_gps =0
 
-def Comunicao(data):
+def Movement_control(data):
 	global x_ref 
 	global y_ref
 	global front_arms_angle
@@ -37,7 +37,7 @@ def Comunicao(data):
 		x_ref = data.data[0]
 		
 		
-def Escada(arms_joint_position): 		
+def Arms_control(arms_joint_position): 		
 	global front_arms_angle
 	global back_arms_angle
 	
@@ -209,7 +209,7 @@ def Imuu(Imu_data):
 	motor.movement_array = (motor1, motor2, motor3, motor4)
 	feedback.publish(motor)
 	
-	print "xref: ", x_ref, "yref: ", y_ref
+	'''print "xref: ", x_ref, "yref: ", y_ref
 	print 'x: ', x, 'y: ', y
 	print "erro = d_ref - d: ", erro
 	print "erro12: ", erro12
@@ -220,13 +220,13 @@ def Imuu(Imu_data):
 	print "horizontal_ref: ", horizontal_reference
 	print "a_d = z: ", a_d
 	print "esquerda_d: ", esquerda_d
-	print '-------------------------'
+	print '-------------------------' #'''
 	
 def talker():
 	rospy.init_node('Movement_Control')	
 	rospy.Subscriber('/sensor/gps', NavSatFix, GPS)
-	rospy.Subscriber('/canaldecomunicao', Float32MultiArray, Comunicao)
-	rospy.Subscriber('/rosi/arms_joints_position', RosiMovementArray, Escada)
+	rospy.Subscriber('/movement_control', Float32MultiArray, Movement_Control)
+	rospy.Subscriber('/rosi/arms_joints_position', RosiMovementArray, Arms_Control)
 	rospy.Subscriber('/sensor/imu', Imu, Imuu)
 	rospy.spin()
 	
