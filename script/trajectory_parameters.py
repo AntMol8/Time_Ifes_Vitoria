@@ -71,7 +71,7 @@ def GPS(data):
                 y_ref = y_ref + gps_y_ref
                 print "Mudou", "amplitude ", amplitude, 'b: ', b, 'desc: ', desc, 'gps_y_ref: ', gps_y_ref, 'gps_x_ref: ', gps_x_ref, 'y_ref: ', y_ref, 'x_ref: ', x_ref
                 #com 2 m/s, 3 minutos simulados para chegar na escada
-	msg = rospy.Publisher('/canaldecomunicao', Float32MultiArray, queue_size = 1)
+	msg = rospy.Publisher('/movement_control', Float32MultiArray, queue_size = 1)
 	pub = Float32MultiArray()
 	a = (x_ref, y_ref, speed, front_angle, back_angle)
 	pub.data = a
