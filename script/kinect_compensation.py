@@ -21,7 +21,6 @@ def callback(data):
 	W = float(data.orientation.w)
 	
 	#Converts quaternions to radians
-	quat_to_radians1= (np.arctan(2*(X*Y + Z*W)))/(1-2*(Y**2+Z**2))
 	quat_to_radians2 = np.arcsin(2*(X*Z - W*Y))
 	
 	#Limits maximum angle
