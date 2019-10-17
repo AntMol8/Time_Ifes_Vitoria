@@ -21,17 +21,17 @@ def callback(data):
 	W = float(data.orientation.w)
 	
 	#Converts quaternions to radians
-	quat_to_radians2 = np.arcsin(2*(X*Z - W*Y))
+	quat_to_radians2 = -np.arcsin(2*(X*Z - W*Y))
 	
 	#Limits maximum angle
 	if(quat_to_radians2 > math.pi/4):
-		quat_to_radians2 = -math.pi/4
+		quat_to_radians2 = math.pi/4
 		
 	if(quat_to_radians2 < -math.pi/4):
-		quat_to_radians2 = math.pi/4 
+		quat_to_radians2 = -math.pi/4 
 	
 	#Publishes angle to kinect joint
-	angle.publish(quat_to_radians2*-1)
+	angle.publish(quat_to_radians2)
 	
 if __name__ == "__main__":
 	try:	
