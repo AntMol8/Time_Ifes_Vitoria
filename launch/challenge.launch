@@ -16,7 +16,9 @@
 	
 	<node name="object_detection_script" pkg="Time_Ifes_Vitoria" type="object_detection.py" respawn="true"/>
 	
-	<node name="cpo" pkg="Time_Ifes_Vitoria" type="cpo.py" respawn="true"/>
+	<node name="cpo_script" pkg="Time_Ifes_Vitoria" type="cpo.py" respawn="true"/>
+	
+	<node name="kinect_compensation_script" pkg="Time_Ifes_Vitoria" type="kinect_compensation.py" respawn="true"/>
 
 
 </launch>
