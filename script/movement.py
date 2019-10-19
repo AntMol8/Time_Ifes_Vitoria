@@ -9,7 +9,7 @@ from rosi_defy.msg import RosiMovement
 from PIL import Image as IMG
 import cv2
 
-mapa = np.zeros([6000, 1200, 3], dtype = np.uint8) #coordenadas da esteira ---------vvvvvv, depois coloco
+mapa = np.zeros([6000, 1200, 3], dtype = np.uint8)
 x1 = int(-51.825*100 + 6000); x2 = int(-2.15*100 + 6000)
 y1 = int(1.245*100 + 600); y2 = int(-1.425*100 + 600)
 cv2.rectangle(mapa, (y2, x2), (y1, x1), (255, 255, 255), -1)
@@ -19,17 +19,11 @@ resolucao = 0.01
 back_arms_angle = 0
 front_arms_angle = 35
 speed = 2
-#angle_reference = 0
 horizontal_reference_gps = 1
 z_quaternion_reference_gps = 0
 resolucao = 0
-'''def ROLO(data):
-	global mapa, resolucao
-	x_rolo = data.data[0]
-	y_rolo = data.data[1]
-	cv2.rectangle(mapa, (int(y_rolo/resolucao) + 600 - 5, int(x_rolo/resolucao) + 6000 - 5), (int(y_rolo/resolucao) + 600 + 5, int(x_rolo/resolucao) + 6000 + 5), (0, 255, 0), -1)'''
 
-def ROLO(data):
+def Detect_Roll(data):
 	global mapa, resolucao
 	x_rolo1 = data.data[0]
 	y_rolo1 = data.data[1]
@@ -37,13 +31,13 @@ def ROLO(data):
 	y_rolo2 = data.data[3]
 	cv2.rectangle(mapa, (int(y_rolo1/resolucao) + 600, int(x_rolo1/resolucao) + 6000), (int(y_rolo2/resolucao) + 600 + 5, int(x_rolo2/resolucao) + 6000 - 5), (0, 255, 0), -1)
 	
-def FOGO(data):
+def Detect_Fire(data):
 	global mapa, resolucao
 	x_rolo = data.data[0]
 	y_rolo = data.data[1]
 	cv2.rectangle(mapa, (int(y_rolo/resolucao) + 600 - 5, int(x_rolo/resolucao) + 6000 - 5), (int(y_rolo/resolucao) + 600 + 5, int(x_rolo/resolucao) + 6000 + 5), (0, 0, 255), -1)
 	
-def Comunicao(data):
+def Coordinates_Control(data):
 	global x_ref 
 	global y_ref
 	global front_arms_angle
@@ -58,7 +52,7 @@ def Comunicao(data):
 		x_ref = data.data[0]
 		
 		
-def Escada(arms_joint_position): 		
+def Arms_Control(arms_joint_position): 		
 	global front_arms_angle
 	global back_arms_angle
 	
@@ -75,14 +69,13 @@ def Escada(arms_joint_position):
 		
 	front_arms_angle = front_arms_angle*np.pi / 180
 	back_arms_angle = back_arms_angle*np.pi / 180
-	ang_ref1 = front_arms_angle; ang_ref3 = -ang_ref1 		#ANGULOS DE REFERENCIA, positivo eh para cima
-	ang_ref2 = back_arms_angle; ang_ref4 = -ang_ref2 		#negativo eh para cima
+	ang_ref1 = front_arms_angle; ang_ref3 = -ang_ref1 		
+	ang_ref2 = back_arms_angle; ang_ref4 = -ang_ref2 		
 
 	erro1 = (arm_right_front-ang_ref1) * 10
 	erro3 = (ang_ref3-arm_left_front) * 10
 	erro2 = (arm_right_back-ang_ref2) * 10
 	erro4 = (ang_ref4-arm_left_back) * 10
-	#print '1: ', erro1, '2: ', erro2, '3: ', erro3, '4: ', erro4
 	speed = 0;
 	motor1 = RosiMovement(); motor1.nodeID = 1; motor1.joint_var = erro1
 	motor2 = RosiMovement(); motor2.nodeID = 2; motor2.joint_var = erro2
@@ -107,7 +100,6 @@ def GPS(GPS_data):
 	x_gps = GPS_data.latitude
 	y_gps = GPS_data.longitude
 	z_gps = GPS_data.altitude
-	#print 'x: ', x_gps, 'y: ', y_gps
  	delta_y = y_ref - y_gps
 	delta_x = x_ref - x_gps
 	
@@ -118,11 +110,9 @@ def GPS(GPS_data):
 		if (angle_reference < 0):
 			angle_reference += np.pi
 	if (delta_y < 0):
-		horizontal_reference_gps = -1 		# eh false
+		horizontal_reference_gps = -1 	
 	else:
 		horizontal_reference_gps = 1
-	#print "angle_reference: ", angle_reference
-	#print "dx: ", delta_x, 'dy: ', delta_y 
 	z_quaternion_reference_gps = np.sin(angle_reference / 2)
 		
 def Parar():
@@ -136,7 +126,7 @@ def Parar():
 	feedback.publish(motor)
 	rospy.sleep(2)
 	
-def Imuu(Imu_data):
+def Orientation_Control(Imu_data):
 	global x_gps
 	global y_gps
 	global z_gps
@@ -167,13 +157,13 @@ def Imuu(Imu_data):
 	a = Imu_data.orientation.w
 	erro = 0.0  				
 	if (a/np.absolute(a) * d < 0):
-		esquerda_d = -1 		# eh false
+		esquerda_d = -1 
 	else:
 		esquerda_d = 1
 		
 	a_dref = np.arcsin(z_quaternion_reference) * 2
 	a_d = np.arcsin(np.absolute(d)) * 2
-	#print 'a_dref: ', a_dref
+
 	if (speed < 0):
 		horizontal_reference = horizontal_reference*speed / np.absolute(speed)		
 		a_dref = np.pi - a_dref
@@ -240,13 +230,13 @@ def Imuu(Imu_data):
 	print '-------------------------'
 	
 def talker():
-	rospy.init_node('Movement_Control')	
+	rospy.init_node('Movement_Control', anonymous = True)	
 	rospy.Subscriber('/sensor/gps', NavSatFix, GPS)
-	rospy.Subscriber('/canaldecomunicao', Float32MultiArray, Comunicao)
-	rospy.Subscriber('/detect_roll', Float32MultiArray, ROLO)
-	rospy.Subscriber('/detect_fire', Float32MultiArray, FOGO)
-	rospy.Subscriber('/rosi/arms_joints_position', RosiMovementArray, Escada)
-	rospy.Subscriber('/sensor/imu', Imu, Imuu)
+	rospy.Subscriber('/trajectory_parameters', Float32MultiArray, Coordinates_Control)
+	rospy.Subscriber('/detect_roll', Float32MultiArray, Detect_Roll)
+	rospy.Subscriber('/detect_fire', Float32MultiArray, Detect_Fire)
+	rospy.Subscriber('/rosi/arms_joints_position', RosiMovementArray, Arms_Control)
+	rospy.Subscriber('/sensor/imu', Imu, Orientation_Control)
 	rospy.spin()
 	
 if __name__ == '__main__':

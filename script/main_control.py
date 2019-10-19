@@ -20,7 +20,7 @@ back_angle = 0
 memory = 0
 flug_arm=0
 
-def BRACO(data):
+def Ur5_Feedback(data):
 	global goals, index, processando, memory
 	
         if (data.data == 1 and (memory != data.data)):
@@ -30,39 +30,15 @@ def BRACO(data):
 		
 	memory = data.data
 	
-def Feedback_CT(data):
+def CT_Feedback(data):
         global flag_retorno
 
 	flag_retorno = data.data[0]
 
-def ORDENS(data):
-        global goals, index, mudou
-        global x_master, y_master
-        global objeto_anterior, flug_arm
-        global speed, front_angle, back_angle
-        
-	msg_l = rospy.Publisher('/canaldocpmo', Float32MultiArray, queue_size = 1)
-        pub_l = Float32MultiArray()
-        print 'adicionado pelo mestre que nao existe'
-        a_l = (1,0)
-        pub_l.data = a_l
-        msg_l.publish(pub_l)
-        if (len(goals) == 0 and (x_master != data.data[0] or y_master != data.data[1])): #pode ser necessario adicionar um or (gps_x==x_master) para modificar as referencias
-                x_master = data.data[0]
-                y_master = data.data[1]
-                speed = data.data[2]
-                front_angle = data.data[3]
-                back_angle = data.data[4]
-                flug_arm = data.data[5]
-                goals.insert(index, (x_objeto, y_objeto, speed, front_angle, back_angle, flug_arm))
-                index += 1
-                processando = 0
-                mudou = 1
-
 def Kinect_Coordinate(data): #data.data[0] vai ser um contador de objetos
         global objeto_anterior, index, processando, mudou
         global speed, front_angle, back_angle, flug_arm, gps_x, gps_y
-	msg_l = rospy.Publisher('/canaldocpmo', Float32MultiArray, queue_size = 1)
+	msg_l = rospy.Publisher('/main_control_feedback', Float32MultiArray, queue_size = 1)
         pub_l = Float32MultiArray()
         print 'cpmo: adicionado do cpo na fila'
         a_l = (1,0)
@@ -93,8 +69,7 @@ def GPS(data):
 	flag_retorno = 0
 	flag_parar = 0
 	print 'cpmo:' , goals[index-1]
-	print 'cpmo: ', len(goals)
-	#rospy.loginfo('aaaaaaaaaaa')
+	print 'cpmo: ', index, len(goals)
 	if(gps_y<0 and gps_x>-51.5 and goals[index - 1][0]<-51.5): #aparentemente foi resolvido, adicionar o opcao na condicao abaixo que corrige todos os problemas
 		index -= 1
 		goals.pop(index)
@@ -119,17 +94,17 @@ def GPS(data):
                         processando = 1
                         mudou = 1
                 else:
-                        msg_a = rospy.Publisher('/canaldoarauto', Float32MultiArray, queue_size = 1)
-                        pub_a = Float32MultiArray()
-                        finalizado = 1
-                        a_a = (finalizado)
-                        pub_a.data = a_a
-                        msg_a.publish(pub_a)
+                        #msg_a = rospy.Publisher('/canaldoarauto', Float32MultiArray, queue_size = 1)
+                        #pub_a = Float32MultiArray()
+                        #finalizado = 1
+                        #a_a = (finalizado)
+                        #pub_a.data = a_a
+                        #msg_a.publish(pub_a)
                         flag_parar = 1
                         mudou = 1
                         
         if (mudou == 1):     #precisa de um flag para quando for subir a escada
-                msg_l = rospy.Publisher('/canaldolacaio', Float32MultiArray, queue_size = 1)
+                msg_l = rospy.Publisher('/main_control', Float32MultiArray, queue_size = 1)
                 pub_l = Float32MultiArray()
                 print 'cpmo: mandou para o lacaio'
 
@@ -152,18 +127,21 @@ def GPS(data):
                 processando = 1
 		
 def Fire_Coordinate(data):
-	global goals, gps_y
+	global goals, gps_y, gps_x
 	x_rolo = data.data[0]
-	goals.append((x_rolo, gps_y, 0, 180, 0, 1, 1))
+	goals.insert(index, (gps_x + 1, gps_y + 1, 0, 180, 0, 1, 1))
+	index += 1
+        processando = 0
+        objeto_anterior = data.data[0]
+        mudou = 1
 
 def talker():
-	rospy.init_node('ARAUTO_DA_MOVIMENTACAO', anonymous = True)
+	rospy.init_node('Main_Control', anonymous = True)
 	rospy.Subscriber('/sensor/gps', NavSatFix, GPS)
-	rospy.Subscriber('/canaldomestre', Float32MultiArray, ORDENS)
-	rospy.Subscriber('/canaldocpo', Float32MultiArray, Kinect_Coordinate)
+	rospy.Subscriber('/object_control', Float32MultiArray, Kinect_Coordinate)
 	rospy.Subscriber('/detect_fire', Float32MultiArray, Fire_Coordinate)
-	rospy.Subscriber('/canalderetornodolacaio', Float32MultiArray, Feedback_CT)
-	rospy.Subscriber('/cpmo', Int8, BRACO, queue_size = 1)
+	rospy.Subscriber('/create_trajectory_feedback', Float32MultiArray, CT_Feedback)
+	rospy.Subscriber('/cpmo', Int8, Ur5_Feedback)
 	rospy.spin()
 	
 if __name__ == '__main__':

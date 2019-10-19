@@ -18,7 +18,7 @@ flag_global = 1
 def Flag_Velodyne(data): #data.data[0] vai ser um contador de objetos
         global flag_global
 
-	msg_l = rospy.Publisher('/canalderetornodovelodyne', Float32MultiArray, queue_size = 1)
+	msg_l = rospy.Publisher('/velodyne_feedback', Float32MultiArray, queue_size = 1)
         pub_l = Float32MultiArray()
         print 'mapa13: retorno do velodyne'
         a_l = (1,0)
@@ -85,7 +85,7 @@ def callback(dado):
 		obj_y = 1
 		obj_x = 0
 		
-		msg = rospy.Publisher('/canaldovelodyne', Float32MultiArray, queue_size = 1)
+		msg = rospy.Publisher('/object_velodyne', Float32MultiArray, queue_size = 1)
 		pub = Float32MultiArray()
 
 		for i in range(0, len(dado.data), 12):
@@ -128,7 +128,6 @@ def callback(dado):
 				if flag == 1:
 					obj_y -= 0.65
 			
-			#cv2.imwrite('mapa1.png', mapa)
 			
 			pub.data = (obj_x, obj_y) #talvez tenha que adicionar um terceiro elemento para servir de comparacao no cpo.py analisando se mandou o flag correto, i.e o dado com o correspondente flag
 			msg.publish(pub)
@@ -143,7 +142,7 @@ def listener():
 	rospy.init_node('SENSOR12', anonymous = True)
 	rospy.Subscriber('/sensor/imu', Imu, IMU)
 	rospy.Subscriber('/sensor/velodyne', PointCloud2, callback)
-	rospy.Subscriber('/canaldoflag_v', Float32MultiArray, Flag_Velodyne)
+	rospy.Subscriber('/OBC_OBV', Float32MultiArray, Flag_Velodyne)
 	rospy.Subscriber('/sensor/gps', NavSatFix, GPS)
 	rospy.spin()
 	

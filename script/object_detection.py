@@ -47,7 +47,7 @@ def callback(datas):
 		initial_h = 0
 		valor_medio_e = 0
 		desv = 0
-		msg=rospy.Publisher('/canaldokinect', Float32MultiArray, queue_size = 1)
+		msg=rospy.Publisher('/object_detection', Float32MultiArray, queue_size = 1)
 		pub=Float32MultiArray()
 		
 		# Matrix of the kinect image
@@ -189,7 +189,7 @@ def callback(datas):
 	
 
 def listener():
-	rospy.init_node('obj_detect_script')
+	rospy.init_node('Object_Detection')
 	rospy.Subscriber('/sensor/gps', NavSatFix, GPS)
 	rospy.Subscriber('/sensor/kinect_depth', Image, callback)
 	rospy.spin()

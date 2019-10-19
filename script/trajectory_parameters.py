@@ -10,14 +10,13 @@ b = 2.0
 desc = 2.646652412/b #constantes de natureza empirica baseada no valor da distancia do objeto
 amplitude = 0
 x_ref=-5; y_ref=-2
-flag_finalizado = 0
 flag_parar = 0
 speed = 1.5
 front_angle = 0
 back_angle = 0
 gps_x_ref=0; gps_y_ref=-2
-flag_core = 0
-def CONTROL(data):
+
+def Trajectory_Parameters(data):
 	global direita #concavidade da curva tanh
 	global flag_objeto, speed, front_angle, back_angle
 	global amplitude
@@ -25,10 +24,10 @@ def CONTROL(data):
 	global flag_parar
 	global gps_x_ref, gps_y_ref
 	global x_ref, y_ref, resolucao
-        #o nucleo dos objetos vai calcular a amplitude
+
 	flag_parar = data.data[0]
 	resolucao = data.data[1]
-	amplitude = data.data[2] #coordenadas do kinect
+	amplitude = data.data[2] 
 	b = data.data[3]
 	speed = data.data[4]
 	front_angle = data.data[5]
@@ -39,12 +38,10 @@ def CONTROL(data):
 		gps_y_ref = data.data[8]
 		x_ref = gps_x_ref+resolucao
 		arg = -b*(x_ref+desc-gps_x_ref)
-                #arg = arg - gps_x_ref #mudei o sinal da referencia
 		y_ref = math.tanh(arg) + 0
-                y_ref = y_ref*amplitude + amplitude #o sinal do antigo flag direita ja esta incluso na amplitude
+                y_ref = y_ref*amplitude + amplitude 
                 y_ref = y_ref + gps_y_ref
-                flag_core=1
-                print 'aaaaaa'
+                print 'trajectory_parameters: recebeu do create_trajectory'
 def GPS(data):
 	global resolucao
 	global desc, amplitude
@@ -57,11 +54,9 @@ def GPS(data):
 	gps_x = data.latitude
 	gps_y = data.longitude
         if(flag_parar==1):
-                speed = 0 #no calculo da dessa diferenca usar a orientacao no lugar do modulo pode ser mais eficiente
+                speed = 0
         elif ( ((np.absolute(gps_x - x_ref) < 0.05) and (np.absolute(gps_y - y_ref) < 0.10)) or (np.absolute(gps_x - x_ref) < 0.02) ):
                 errox = gps_x - x_ref; erroy = gps_y - y_ref
-                print 'x_ref: ', x_ref, 'erro_x: ', errox, 'erro_y: ', erroy, 'y_ref: ', y_ref
-                #f(x)=a*tgh(-b (x+(2.6466)/(b))+d)+a
                 #f(x)=a*tgh(-b (x+(2.6466)/(b)-d))+a+c
                 x_ref = gps_x + resolucao
                 arg = -b*(x_ref+desc- gps_x_ref)
@@ -71,7 +66,7 @@ def GPS(data):
                 y_ref = y_ref + gps_y_ref
                 print "Mudou", "amplitude ", amplitude, 'b: ', b, 'desc: ', desc, 'gps_y_ref: ', gps_y_ref, 'gps_x_ref: ', gps_x_ref, 'y_ref: ', y_ref, 'x_ref: ', x_ref
                 #com 2 m/s, 3 minutos simulados para chegar na escada
-	msg = rospy.Publisher('/canaldecomunicao', Float32MultiArray, queue_size = 1)
+	msg = rospy.Publisher('/trajectory_parameters', Float32MultiArray, queue_size = 1)
 	pub = Float32MultiArray()
 	a = (x_ref, y_ref, speed, front_angle, back_angle)
 	pub.data = a
@@ -80,7 +75,7 @@ def GPS(data):
 def talker():
 	rospy.init_node('Path_Planning', anonymous = True)
 	rospy.Subscriber('/sensor/gps', NavSatFix, GPS)
-	rospy.Subscriber('/canaldosobjetos', Float32MultiArray, CONTROL)
+	rospy.Subscriber('/create_trajetory', Float32MultiArray, Trajectory_Parameters)
 	rospy.spin()
 	
 if __name__ == '__main__':
