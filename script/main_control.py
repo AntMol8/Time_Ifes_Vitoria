@@ -6,10 +6,9 @@ from sensor_msgs.msg import NavSatFix
 
 gps_x, x_ref = 0, 0
 gps_y, y_ref = 0, 0
-#goals = [(0.0, -2.2, 0, 180, 0, 0), (-1.5, -2.2, 2, 180, 0, 0) , (-1.5, -2.2, 0, 180, 0, 1),(-5.70, -2.2, 2, 180, 0, 0), (-11.9, -2.2, 2, 180, 0, 0),(-13.2, -3.0, 2, 180, 0, 0),(-14.7, -3.0, 2, 180, 0, 0),(-15.5, -1.95, 2, 180, 0, 0),(-20.0, -1.95, 2, 180, 0, 0),(-21.3, -2.4, 2, 180, 0, 0),(-22.0, -2.4, 2, 180, 0, 0),(-23.3, -1.85, 2, 180, 0, 0),(-39.4, -1.85, 2, 180, 0, 0),(-42.0, -3.4, 2, 180, 0, 0),(-52.0, -3.4, 2, 180, 0, 0),(-57.0, 3.4, 2, 180, 0, 0),(-42.0, 3.4, 2, 180, 0, 0),(-38.0, 1.85, -2, 180, 0, 0), (-41.6, 1.85, -2, 35, 35, 0), (-42.55, 1.85, -2, 180, 35, 2), (-42.9, 1.85, -2, 180, 0, 2), (-51.0, 1.85, 2, 180, 0, 2), (-50.0, 1.85, 0, 180, 0, 1), (-46.20, 1.85, 2, 180, 0, 2), (-43.00, 1.85, 3, 0, 45, 0), (-41.5, 1.85, 2, 180, 0, 0), (-9.0, 1.85, 0, 180, 0, 1), (-6.77, 1.85, 2, 180, 0, 0), (-9.0, 1.85, 0, 180, 0, 1), (-6.31, 1.85, 2, 180, 0, 0), (-3.0, 3.0, 2, 180, 0, 0)] #----antes das duas tangentes, (x,y,speed,frontal, traseiro,???)
-#goals = [(0.0, -2.2, 0, 180, 0, 0), (-1.5, -2.2, 2, 180, 0, 0) , (-1.5, -2.2, 0, 180, 0, 1),(-5.70, -2.2, 2, 180, 0, 0), (-11.9, -2.2, 2, 180, 0, 0),(-13.2, -3.0, 2, 180, 0, 0),(-14.7, -3.0, 2, 180, 0, 0),(-15.5, -1.95, 2, 180, 0, 0),(-20.0, -1.95, 2, 180, 0, 0),(-21.3, -2.4, 2, 180, 0, 0),(-22.0, -2.4, 2, 180, 0, 0),(-23.3, -1.85, 2, 180, 0, 0),(-39.4, -1.85, 2, 180, 0, 0),(-42.0, -3.4, 2, 180, 0, 0),(-52.0, -3.4, 2, 0, 0, 0),(-56.0, 0, 2, 0, 0, 0),(-52.0, 3.4, 2, 0, 0, 0),(-42.0, 3.4, 2, 180, 0, 0),(-38.0, 1.85, -2, 180, 0, 0), (-41.6, 1.85, -2, 35, 35, 0), (-42.55, 1.85, -2, 180, 35, 2), (-42.9, 1.85, -2, 180, 0, 2), (-51.0, 1.85, 2, 180, 0, 2), (-50.0, 1.85, 0, 180, 0, 1), (-46.20, 1.85, 2, 180, 0, 2), (-43.00, 1.85, 3, 0, 45, 0), (-41.5, 1.85, 2, 180, 0, 0), (-9.0, 1.85, 0, 180, 0, 1), (-6.77, 1.85, 2, 180, 0, 0), (-9.0, 1.85, 0, 180, 0, 1), (-6.31, 1.85, 2, 180, 0, 0), (-3.0, 3.0, 2, 180, 0, 0)] #corrigido o final / index = len(goals)-15
-goals = [(0.0, -2.2, 0, 180, 0, 0),(-1.0, -1.85, 2, 180, 0, 0),(-39.4, -1.85, 2, 180, 0, 0),(-42.0, -3.4, 2, 180, 0, 0),(-52.0, -3.4, 2, 0, 0, 0),(-56.0, 0, 2, 0, 0, 0),(-52.0, 3.4, 2, 0, 0, 0),(-42.0, 3.4, 2, 180, 0, 0),(-38.0, 1.85, -2, 180, 0, 0), (-41.6, 1.85, -2, 35, 35, 0), (-42.55, 1.85, -2, 180, 35, 2), (-42.9, 1.85, -2, 180, 0, 2), (-51.0, 1.85, 2, 180, 0, 2), (-43.00, 1.85, 3, 0, 45, 0), (-41.5, 1.85, 2, 180, 0, 0), (-6.31, 1.85, 2, 180, 0, 0), (-3.0, 3.0, 2, 180, 0, 0)]
-index = len(goals)-2
+#(x,y,speed,frontal, traseiro,braco, recebe dos sensores)
+goals = [(0.0, -1.2, 0, 180, 0, 0, 0),(-3.0, -3, 2, 180, 0, 0, 0),(-7.0, -1.95, 2, 180, 0, 0, 0),(-41.75, -2.01, 2, -45, -45, 0, 1),(-42.32, -2.01, 2, -45, 0, 0, 1),(-42.88, -2.01, 2, 0, 0, 0, 1),(-50.85, -2.01, -2, 0, 0, 0, 1),(-42.72, -2.01, -3, -45, 0, 0, 1),(-41.83, -2.01, -2, 0, -45, 0, 1), (-41.5, -2.01, -2, 0, 0, 0, 1), (-39.4, -2.01, 2, 180, 0, 0, 1),(-42.0, -3.4, 2, 180, 0, 0, 0),(-52.0, -3.4, 2, 0, 0, 0, 0),(-56.0, 0, 2, 0, 0, 0, 0),(-52.0, 3.4, 2, 0, 0, 0, 0),(-42.0, 3.4, 2, 180, 0, 0, 0),(-38.0, 1.85, -2, 180, 0, 0, 1), (-41.6, 1.85, -2, 35, 35, 0, 1), (-42.55, 1.85, -2, 180, 35, 2, 1), (-42.9, 1.85, -2, 180, 0, 2, 1), (-51.0, 1.85, 2, 180, 0, 2, 1), (-43.00, 1.85, 3, 0, 45, 0, 1), (-41.5, 1.85, 2, 180, 0, 0), (-6.31, 1.85, 2, 180, 0, 0), (-3.0, 3.0, 2, 180, 0, 0)]
+index = len(goals)
 x_master, y_master = 0, 0
 objeto_anterior = 111
 processando = 1 #eh false, 1 = 0 mudei para testar a fila
@@ -44,7 +43,7 @@ def ORDENS(data):
         
 	msg_l = rospy.Publisher('/canaldocpmo', Float32MultiArray, queue_size = 1)
         pub_l = Float32MultiArray()
-        print '-------------------'
+        print 'adicionado pelo mestre que nao existe'
         a_l = (1,0)
         pub_l.data = a_l
         msg_l.publish(pub_l)
@@ -62,17 +61,21 @@ def ORDENS(data):
 
 def SUBORDENS(data): #data.data[0] vai ser um contador de objetos
         global objeto_anterior, index, processando, mudou
-        global speed, front_angle, back_angle, flug_arm
-        global gps_x, gps_y
-
-        if (objeto_anterior != data.data[0] and (-6 > gps_x > -51) ):
+        global speed, front_angle, back_angle, flug_arm, gps_x, gps_y
+	msg_l = rospy.Publisher('/canaldocpmo', Float32MultiArray, queue_size = 1)
+        pub_l = Float32MultiArray()
+        print 'cpmo: adicionado do cpo na fila'
+        a_l = (1,0)
+        pub_l.data = a_l
+        msg_l.publish(pub_l)
+        if ( (goals[index - 1][0] != data.data[1] or goals[index - 1][1] != data.data[2]) and data.data[7] !=1): #analisar se isso eh generalizado
                 x_objeto = data.data[1]
                 y_objeto = data.data[2]
                 speed = data.data[3]
                 front_angle = data.data[4]
                 back_angle = data.data[5]
                 flug_arm = data.data[6]
-                goals.insert(index, (x_objeto, y_objeto, speed, front_angle, back_angle, flug_arm))
+                goals.insert(index, (x_objeto, y_objeto, speed, front_angle, back_angle, flug_arm, data.data[7]))
                 index += 1
                 processando = 0
                 objeto_anterior = data.data[0]
@@ -89,8 +92,8 @@ def GPS(data):
 	gps_y = data.longitude
 	flag_retorno = 0
 	flag_parar = 0
-	print goals
-	print len(goals)
+	print 'cpmo:' , goals[index-1]
+	print 'cpmo: ', len(goals)
 	#rospy.loginfo('aaaaaaaaaaa')
 	if(gps_y<0 and gps_x>-51.5 and goals[index - 1][0]<-51.5): #aparentemente foi resolvido, adicionar o opcao na condicao abaixo que corrige todos os problemas
 		index -= 1
@@ -103,7 +106,6 @@ def GPS(data):
 		processando = 0'''
 	
 	if (len(goals) != 0):
-		print goals[index - 1][5]
 		flug = rospy.Publisher('/armBrain', Int8, queue_size = 1)
 		flug.publish(goals[index - 1][5])
 		
@@ -129,7 +131,7 @@ def GPS(data):
         if (mudou == 1):     #precisa de um flag para quando for subir a escada
                 msg_l = rospy.Publisher('/canaldolacaio', Float32MultiArray, queue_size = 1)
                 pub_l = Float32MultiArray()
-                print '-------------------'
+                print 'cpmo: mandou para o lacaio'
 
                 if (len(goals) != 0):
                         x_ref = goals[index-1][0]
@@ -142,7 +144,7 @@ def GPS(data):
                 pub_l.data = a_l
 
                 while (flag_retorno != 1 and len(goals) != 0):
-                	print "-"
+                	print "cpmo: recebendo retorno do lacaio"
 	                msg_l.publish(pub_l)
                         
 	        flag_retorno = 0

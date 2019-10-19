@@ -64,8 +64,10 @@ def GPS(data): #para o calculo da orientacao tem que saber a orientacao
 	gps_x = data.latitude
 	gps_y = data.longitude
         delta_x = gps_x - x_objeto #substitui gps_x por gps_x_ref
-        
-        b = 2.646652412 / (delta_x/np.absolute(delta_x)*np.absolute(delta_x-0.3)/2) #0.3 eh para dar uma margem de seguranca
+        if(abs(delta_x)>0.3):
+        	b = 2.646652412 / (delta_x/np.absolute(delta_x)*np.absolute(abs(delta_x)-0.3)/2) #0.3 eh para dar uma margem de seguranca
+        else:
+        	b = 2.646652412 / (delta_x/np.absolute(delta_x)*np.absolute(abs(delta_x))/2)
         delta_y = -gps_y + y_objeto #substitui gps_y por gps_y_ref
         
         if (delta_x < 0):

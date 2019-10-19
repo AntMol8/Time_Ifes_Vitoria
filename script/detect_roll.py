@@ -63,7 +63,6 @@ def position(GPS_data):
 			if (pos_x + 0.2 > previous_roll_x[i] and pos_x - 0.2 < previous_roll_x[i]) and (pos_y + 0.2 > previous_roll_y[i] and pos_y - 0.2 < previous_roll_y[i]):
 				check = 1
 		if check == 0:
-			print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
 			n += 1
 			coordinates.append(pos_x)
 			coordinates.append(pos_y)
@@ -131,10 +130,6 @@ def callback(Hokuyo_data):
 						roll = True
 						print(roll)
 						return
-
-
-		
-
 
 if __name__ == "__main__":
 	try:	

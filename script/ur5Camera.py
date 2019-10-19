@@ -56,11 +56,11 @@ def callback_u(datas):
 	binary = cv2.inRange(img, lower, upper)
 	mask = cv2.morphologyEx(binary, cv2.MORPH_CLOSE, cv2.getStructuringElement(cv2.MORPH_RECT, (3, 50)))
 	
-	cv2.imshow('binary', binary)
-	cv2.waitKey(1)
+	#cv2.imshow('binary', binary)
+#	cv2.waitKey(1)
 	
-	cv2.imshow('mask', mask)
-	cv2.waitKey(1)
+	#cv2.imshow('mask', mask)
+	#cv2.waitKey(1)
 	
 	cnt = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)[-2]
 	
@@ -74,10 +74,10 @@ def callback_u(datas):
 		img[py-1: py+1, px-1: px+1] = [0, 255, 0]
 		cv2.rectangle(img, (x, y),(x + w, y + h),(0, 255, 0), 2)
 
-	cv2.imshow('img', img)
-	if cv2.waitKey(1) & 0xFF == ord('q'):
-		cv2.destroyAllWindows()
-		rospy.signal_shutdown('FIM')
+	#cv2.imshow('img', img)
+	#if cv2.waitKey(1) & 0xFF == ord('q'):
+	#	cv2.destroyAllWindows()
+	#	rospy.signal_shutdown('FIM')
 
 def listener():
 #Inits node and declares subscribers

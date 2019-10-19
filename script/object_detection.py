@@ -132,7 +132,7 @@ def callback(datas):
 						dest_x = dist_media/(total*1000) + gps_x_global - 0.1 - 0.3248
 						dest_y = (void-320)*0.00173667* (dist_esc/(total*1000))+0.2+ gps_y_global
 						print dest_y
-						if dest_y > -1.9:
+						if dest_y > -1.75:
 							fake_void = True
 					if gps_y_global > 0:
 						dest_x = -dist_media/(total*1000) + gps_x_global + 0.1 + 0.3248
@@ -182,10 +182,10 @@ def callback(datas):
 						dest_y_global = 0
 						
 			
-		cv2.imshow("Image", imagem)
-		if cv2.waitKey(1) & 0xFF == ord('q'):
-		    	cv2.destroyAllWindows()
-			rospy.signal_shutdown('FIM')
+		#cv2.imshow("Image", imagem)
+		#if cv2.waitKey(1) & 0xFF == ord('q'):
+		#    	cv2.destroyAllWindows()
+		#	rospy.signal_shutdown('FIM')
 	
 
 def listener():

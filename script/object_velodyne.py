@@ -12,6 +12,19 @@ from struct import unpack, pack
 imu_x_global, imu_y_global, imu_z_global = 0, 0, 0
 gps_x_global, gps_y_global, gps_z_global = 0.0, 0.0, 0.0
 inn = 50
+flag = 1
+flag_global = 1
+
+def Flag_Velodyne(data): #data.data[0] vai ser um contador de objetos
+        global flag_global
+
+	msg_l = rospy.Publisher('/canalderetornodovelodyne', Float32MultiArray, queue_size = 1)
+        pub_l = Float32MultiArray()
+        print 'mapa13: retorno do velodyne'
+        a_l = (1,0)
+        pub_l.data = a_l
+        msg_l.publish(pub_l)
+        flag_global = data.data[0]
 
 def GPS(GPS_data):
 	global gps_x_global
@@ -52,16 +65,16 @@ def callback(dado):
 	global gps_y_global
 	global gps_z_global
 	global orientation
+	global flag_global
 	global inn
-	
-	print inn
 	
 	if (inn > 50):
 		inn = 0
 		gps_x = gps_x_global
 		gps_y = gps_y_global
 		
-		flag = 1
+		#flag = 1
+		flag = flag_global
 		
 		mapa = np.zeros((10000, 3000), np.uint8)
 
@@ -74,8 +87,6 @@ def callback(dado):
 		
 		msg = rospy.Publisher('/canaldovelodyne', Float32MultiArray, queue_size = 1)
 		pub = Float32MultiArray()
-			
-		
 
 		for i in range(0, len(dado.data), 12):
 			value_x = unpack('f', dado.data[i: i+4])[0]
@@ -92,14 +103,14 @@ def callback(dado):
 			
 			
 			if flag == 1:
-				if (z >= -0.25) and (1 <= x <= 4) and (-3 <= y <= 0.25):
+				if (z >= -0.25) and (1 <= x <= 3.5) and (-1.25 <= y <= 0.25):
 					mapa[int(x*100 + 5000), int(y*100 + 1500)] = 255
 					if y < obj_y:
 						obj_y = y
 						obj_x = x
 				
 			elif flag == 2:
-				if (z >= -0.25) and (0 <= x <= 3) and (1 > y > 0.4):
+				if (z >= -0.25) and (0 <= x <= 3) and (1 > y > 0.3):
 					mapa[int(x*100 + 5000), int(y*100 + 1500)] = 255
 					if x > obj_x:
 						obj_x = x
@@ -108,15 +119,23 @@ def callback(dado):
 		if obj_x != 0:
 			if gps_y_global	> 0:
 				obj_x = gps_x - obj_x - 0.2425
-				obj_y = gps_y - obj_y + 0.65
+				obj_y = gps_y - obj_y
+				if flag == 1:
+					obj_y += 0.65
 			else:
 				obj_x += gps_x + 0.2425
-				obj_y += gps_y - 0.65 #analisa a angulacao nas curvas
+				obj_y += gps_y
+				if flag == 1:
+					obj_y -= 0.65
 			
-			cv2.imwrite('mapa1.png', mapa)
-			print obj_x, obj_y
-			pub.data = (obj_x, obj_y)
+			#cv2.imwrite('mapa1.png', mapa)
+			
+			pub.data = (obj_x, obj_y) #talvez tenha que adicionar um terceiro elemento para servir de comparacao no cpo.py analisando se mandou o flag correto, i.e o dado com o correspondente flag
 			msg.publish(pub)
+			if(flag==1):
+				print 'mapa13: PUBLICADO DO VELODYNE flag 1', obj_x, obj_y
+			elif(flag==2):
+				print 'mapa13: PUBLICADO DO VELODYNE flag 2', obj_x, obj_y
 		
 	#rospy.signal_shutdown('FIM')			
 			
@@ -124,6 +143,7 @@ def listener():
 	rospy.init_node('SENSOR12', anonymous = True)
 	rospy.Subscriber('/sensor/imu', Imu, IMU)
 	rospy.Subscriber('/sensor/velodyne', PointCloud2, callback)
+	rospy.Subscriber('/canaldoflag_v', Float32MultiArray, Flag_Velodyne)
 	rospy.Subscriber('/sensor/gps', NavSatFix, GPS)
 	rospy.spin()
 	
