@@ -30,7 +30,7 @@ def BRACO(data):
 		
 	memory = data.data
 	
-def RETORNO(data):
+def Feedback_CT(data):
         global flag_retorno
 
 	flag_retorno = data.data[0]
@@ -59,7 +59,7 @@ def ORDENS(data):
                 processando = 0
                 mudou = 1
 
-def SUBORDENS(data): #data.data[0] vai ser um contador de objetos
+def Kinect_Coordinate(data): #data.data[0] vai ser um contador de objetos
         global objeto_anterior, index, processando, mudou
         global speed, front_angle, back_angle, flug_arm, gps_x, gps_y
 	msg_l = rospy.Publisher('/canaldocpmo', Float32MultiArray, queue_size = 1)
@@ -150,14 +150,19 @@ def GPS(data):
 	        flag_retorno = 0
                 mudou = 0
                 processando = 1
-        
+		
+def Fire_Coordinate(data):
+	global goals, gps_y
+	x_rolo = data.data[0]
+	goals.append((x_rolo, gps_y, 0, 180, 0, 1, 1))
 
 def talker():
 	rospy.init_node('ARAUTO_DA_MOVIMENTACAO', anonymous = True)
 	rospy.Subscriber('/sensor/gps', NavSatFix, GPS)
 	rospy.Subscriber('/canaldomestre', Float32MultiArray, ORDENS)
-	rospy.Subscriber('/canaldocpo', Float32MultiArray, SUBORDENS)
-	rospy.Subscriber('/canalderetornodolacaio', Float32MultiArray, RETORNO)
+	rospy.Subscriber('/canaldocpo', Float32MultiArray, Kinect_Coordinate)
+	rospy.Subscriber('/detect_fire', Float32MultiArray, Fire_Coordinate)
+	rospy.Subscriber('/canalderetornodolacaio', Float32MultiArray, Feedback_CT)
 	rospy.Subscriber('/cpmo', Int8, BRACO, queue_size = 1)
 	rospy.spin()
 	
