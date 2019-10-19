@@ -18,7 +18,7 @@ temp_y_ref = 0
 
 def Velodyne_Feedback(data):
         global flag_velodyne
-
+	
 	flag_velodyne = data.data[0]
 
 def MC_Feedback(data):
@@ -30,9 +30,9 @@ def Velodyne(data): #precisa corrigir o problema no velodyne no cenario caso 1.t
 	global x_velodyne, y_velodyne, gps_x, gps_y
 	x = data.data[0]
 	y = data.data[1]
-	if(abs(gps_x-x)<3 and abs(gps_x-x)<2):
-		x_velodyne = x
-		y_velodyne = y
+	print 'velodyne'
+	x_velodyne = x
+	y_velodyne = y
 	
 def Kinect(data):     
 	global gps_x, gps_y
@@ -40,7 +40,8 @@ def Kinect(data):
 	objeto = data.data[0]
 	x = data.data[1]
 	y = data.data[2]
-	if (abs(gps_y) - 1.85) < 0.15 and (abs(gps_x-x)<3 and abs(gps_x-x)<2):
+	print 'kinect'
+	if (abs(gps_y) - 1.85) < 0.15 and (abs(gps_x-x)<3 and abs(gps_y-y)<2):
 		x_kinect = x
 		y_kinect = y
 		objeto = data.data[0]
@@ -52,13 +53,14 @@ def GPS(data):
 	global flag_retorno, flag_desvio, flag_volta
 	global flag_velodyne
 	global temp_x_ref, temp_y_ref
-	
         gps_x = data.latitude
 	gps_y = data.longitude
+	print 'cpo: gps', objeto,"desvio: ", flag_desvio, "volta: ", flag_volta, "x: ", gps_x
+	print 'x_velodyne: ', x_velodyne, 'x_kinect: ', x_kinect
 	if((-6.31>gps_x>-51.0)):
 		if(objeto!=1):
 			if(flag_desvio==0 and flag_volta == 0):
-				msg_l = rospy.Publisher('/OBC_OBV', Float32MultiArray, queue_size = 1)
+				msg_l = rospy.Publisher('/OBC_OBV', Float32MultiArray, queue_size = 1) 
 				while (flag_velodyne != 1):
 					pub_l = Float32MultiArray()
 					print 'cpo: controlando o flag_v'
@@ -85,7 +87,7 @@ def GPS(data):
 					
 					pub_main = rospy.Publisher('/object_control', Float32MultiArray, queue_size = 1)
 					a = Float32MultiArray()
-					a.data = (objeto, x_pub, y_pub, 2, 180, 0, 0, 1)
+					a.data = (objeto, x_pub, y_pub, 2, 180, 0, 0, 0)
 					x_desvio_ref = x_pub
 					y_desvio_ref = y_pub
 					flag_retorno = 0
@@ -131,29 +133,30 @@ def GPS(data):
 					#analisar qual dos dois valores pegar se erro for muito grande
 					pub_main = rospy.Publisher('/object_control', Float32MultiArray, queue_size = 1)
 					a = Float32MultiArray()
-					a.data = (objeto, x_pub, y_pub, 2, 180, 0, 0, 1)
+					a.data = (objeto, x_pub, y_pub, 2, 180, 0, 0, 0)
 					flag_retorno = 0
 					while (flag_retorno != 1):
 						print "cpo: mandando para o cpmo volta"
 						pub_main.publish(a)
 					flag_retorno = 0
-					flag_volta = 0
+					flag_desvio = 1
+					flag_volta = 1
 					flag_velodyne = 0
 					x_kinect = 0
 					y_kinect = 0
 					x_velodyne = 0
 					y_velodyne = 0
-					temp_x_ref = 0
-					temp_y_ref = 0
+					temp_x_ref = x_pub
+					temp_y_ref = y_pub
 				else:
 					print 'cpo: temp_x_ref', temp_x_ref, temp_y_ref
 					if(temp_x_ref == 0 and temp_y_ref == 0 and x_velodyne==0): #tem uma limitacao aqui
 						if(gps_y>0):
-							temp_x_ref = gps_x - 1 #mudei de 0.25 para 1 para implementar a volta automatica
+							temp_x_ref = gps_x - 0.5 #mudei de 0.25 para 1 para implementar a volta automatica
 							temp_y_ref = gps_y
 						
 						else:
-							temp_x_ref = gps_x + 1
+							temp_x_ref = gps_x + 0.5
 							temp_y_ref = gps_y
 						x_pub = temp_x_ref
 						y_pub = temp_y_ref
@@ -166,9 +169,19 @@ def GPS(data):
 							print "cpo: mandando para o cpmo temporario"
 							pub_main.publish(a)
 						flag_retorno = 0
+			elif(flag_desvio == 1 and flag_volta == 1):
+					if(np.absolute(temp_x_ref - gps_x) < 0.03):
+						flag_desvio = 0
+						flag_volta = 0
+						x_kinect = 0
+						y_kinect = 0
+						x_velodyne = 0
+						y_velodyne = 0
+						
+					
 						
 					#if(np.absolute(temp_x_ref - gps_x) < 0.05 and np.absolute(temp_y_ref - gps_y) < 0.05 ):
-	else:
+	'''else:
 		flag_volta = 0
 		flag_desvio = 0
 		flag_retorno = 0
@@ -176,7 +189,7 @@ def GPS(data):
 		x_kinect = 0
 		y_kinect = 0
 		x_velodyne = 0
-		y_velodyne = 0
+		y_velodyne = 0'''
 		
 def talker():
 	rospy.init_node('Object_Control', anonymous = True)
