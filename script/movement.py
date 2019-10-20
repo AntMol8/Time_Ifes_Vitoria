@@ -29,7 +29,7 @@ def Detect_Roll(data):
 	y_rolo1 = int(data.data[1]/resolucao) + 600
 	x_rolo2 = int(data.data[2]/resolucao) + 6000
 	y_rolo2 = int(data.data[3]/resolucao) + 600
-	if (mapa[y_rolo1, x_rolo1] == [0, 0, 255] or mapa[y_rolo2, x_rolo1] == [0, 0, 255] or mapa[y_rolo1, x_rolo2] == [0, 0, 255] or mapa[y_rolo2, x_rolo2] == [0, 0, 255]):
+	if ((mapa[x_rolo1, y_rolo1] == (0, 0, 255)).all() or (mapa[x_rolo2, y_rolo1] == (0, 0, 255)).all() or (mapa[x_rolo1, y_rolo2] == (0, 0, 255)).all() or (mapa[x_rolo2, y_rolo2] == (0, 0, 255)).all()):
 		return
 		
 	cv2.rectangle(mapa, y_rolo1, x_rolo1, y_rolo2 + 5, x_rolo2 - 5, (0, 255, 0), -1)
