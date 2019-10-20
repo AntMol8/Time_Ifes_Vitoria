@@ -12,7 +12,7 @@ def listener():
 	rospy.spin()
 	
 def callback(data):
-	angle = rospy.Publisher('/rosi/command_kinect_joint', Float32, queue_size=10)
+	angle = rospy.Publisher('/rosi/command_kinect_joint', Float32, queue_size = 10)
 	
 	#gets IMU output
 	X = float(data.orientation.x)
@@ -24,11 +24,11 @@ def callback(data):
 	quat_to_radians2 = -np.arcsin(2*(X*Z - W*Y))
 	
 	#Limits maximum angle
-	if(quat_to_radians2 > math.pi/4):
-		quat_to_radians2 = math.pi/4
+	if (quat_to_radians2 > math.pi / 4):
+		quat_to_radians2 = math.pi / 4
 		
-	if(quat_to_radians2 < -math.pi/4):
-		quat_to_radians2 = -math.pi/4 
+	if (quat_to_radians2 < -math.pi / 4):
+		quat_to_radians2 = -math.pi / 4 
 	
 	#Publishes angle to kinect joint
 	angle.publish(quat_to_radians2)
