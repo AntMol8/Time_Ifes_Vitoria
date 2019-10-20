@@ -27,11 +27,11 @@ def MC_Feedback(data):
 	flag_retorno = data.data[0]
 
 def Velodyne(data): #precisa corrigir o problema no velodyne no cenario caso 1.ttt, com o objeto pequeno, aparentemente ele identifica uma parte da lateral na programacao jah estava previsto, mas nao funcionou corretamente- recomendaria usar o rviz junto com o launch para testar se ele nao ve o chao
-	global x_velodyne, y_velodyne, gps_x, gps_y, flag_desvio, flag_volta, objeto
+	global x_velodyne, y_velodyne, gps_x, gps_y, flag_desvio, flag_volta, objeto, x_kinect
 	x = data.data[0]
 	y = data.data[1]
 	print 'velodyne'
-	if(flag_desvio==0 and flag_volta == 0 and objeto != 1):
+	if(flag_desvio==0 and flag_volta == 0 and objeto != 1 and x_kinect != 0):
 		x_velodyne = x
 		y_velodyne = y
 	else:
@@ -113,7 +113,7 @@ def GPS(data):
 					y_velodyne = 0
 					
 			elif(flag_desvio==1 and flag_volta == 0): #main_control.py jah remove da fila quando isso eh satisfeito, talvez aqui tambem tenha que fazer uma publicacao
-				print 'cpo: desviando'
+				print 'cpo: desviando x_desvio_ref: ', x_desvio_ref 
 				if( np.absolute(x_desvio_ref - gps_x) < 0.05 and np.absolute(y_desvio_ref - gps_y) < 0.05):
 					flag_desvio = 0 #pode ter um problema de sincronismo, se adicionar na pilha o proximo elemento antes dela ter removido o anterior
 					flag_volta = 1
