@@ -95,7 +95,7 @@ def callback(datas):
 					        stair = True
 					        break
 				if stair:
-				 	for q in range(begin + 50, 640):
+				 	for q in range(begin + 50, 630):
 				 		if imagem[k][q]!=255:
 				 			initial_h = q
 				 			break

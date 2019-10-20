@@ -61,14 +61,14 @@ def GPS(data): #para o calculo da orientacao tem que saber a orientacao
                 
         amplitude = delta_y / 2
         resolucao = orientation * 0.15
-        msg = rospy.Publisher('/create_trajetory', Float32MultiArray, queue_size = 10)
+        msg = rospy.Publisher('/create_trajectory', Float32MultiArray, queue_size = 10)
         pub = Float32MultiArray()
         a = (flag_parar, resolucao, amplitude, b, speed, front_angle, back_angle, gps_x_ref, gps_y_ref)
         pub.data = a
-        if (flag_core != 0):
-        	print 'create_trajectory: mandou para trajectory_parameters'
+        if(flag_core!=0):
+        	print 'create_trajectory: delta_y trajectory_parameters', amplitude
 		msg.publish(pub)
-		flag_core = 0
+	flag_core=0
 
 def talker():
 	rospy.init_node('Hyperbolic_Tangent', anonymous = True)

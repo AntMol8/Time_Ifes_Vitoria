@@ -24,16 +24,15 @@ def Trajectory_Parameters(data):
 	global flag_parar
 	global gps_x_ref, gps_y_ref
 	global x_ref, y_ref, resolucao
-
-	flag_parar = data.data[0]
-	resolucao = data.data[1]
-	amplitude = data.data[2] 
-	b = data.data[3]
-	speed = data.data[4]
-	front_angle = data.data[5]
-	back_angle = data.data[6]
-	desc = 2.646652412/b
 	if(gps_x_ref!=data.data[7]): #-------acho que precisa de mais coisa
+		flag_parar = data.data[0]
+		resolucao = data.data[1]
+		amplitude = data.data[2] 
+		b = data.data[3]
+		speed = data.data[4]
+		front_angle = data.data[5]
+		back_angle = data.data[6]
+		desc = 2.646652412/b
 		gps_x_ref = data.data[7]
 		gps_y_ref = data.data[8]
 		x_ref = gps_x_ref+resolucao
@@ -41,7 +40,7 @@ def Trajectory_Parameters(data):
 		y_ref = math.tanh(arg) + 0
                 y_ref = y_ref*amplitude + amplitude 
                 y_ref = y_ref + gps_y_ref
-                print 'trajectory_parameters: recebeu do create_trajectory'
+                print 'trajectory_parameters: recebeu do create_trajectory', x_ref, y_ref
 def GPS(data):
 	global resolucao
 	global desc, amplitude
@@ -64,7 +63,7 @@ def GPS(data):
                 y_ref = math.tanh(arg) + 0
                 y_ref = y_ref*amplitude + amplitude #o sinal do antigo flag direita ja esta incluso na amplitude
                 y_ref = y_ref + gps_y_ref
-                print "Mudou", "amplitude ", amplitude, 'b: ', b, 'desc: ', desc, 'gps_y_ref: ', gps_y_ref, 'gps_x_ref: ', gps_x_ref, 'y_ref: ', y_ref, 'x_ref: ', x_ref
+                print "trajectory_parameters: Mudou", "amplitude ", amplitude, 'b: ', b, 'desc: ', desc, 'gps_y_ref: ', gps_y_ref, 'gps_x_ref: ', gps_x_ref, 'y_ref: ', y_ref, 'x_ref: ', x_ref
                 #com 2 m/s, 3 minutos simulados para chegar na escada
 	msg = rospy.Publisher('/trajectory_parameters', Float32MultiArray, queue_size = 1)
 	pub = Float32MultiArray()
@@ -75,7 +74,7 @@ def GPS(data):
 def talker():
 	rospy.init_node('Path_Planning', anonymous = True)
 	rospy.Subscriber('/sensor/gps', NavSatFix, GPS)
-	rospy.Subscriber('/create_trajetory', Float32MultiArray, Trajectory_Parameters)
+	rospy.Subscriber('/create_trajectory', Float32MultiArray, Trajectory_Parameters)
 	rospy.spin()
 	
 if __name__ == '__main__':

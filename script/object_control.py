@@ -27,24 +27,33 @@ def MC_Feedback(data):
 	flag_retorno = data.data[0]
 
 def Velodyne(data): #precisa corrigir o problema no velodyne no cenario caso 1.ttt, com o objeto pequeno, aparentemente ele identifica uma parte da lateral na programacao jah estava previsto, mas nao funcionou corretamente- recomendaria usar o rviz junto com o launch para testar se ele nao ve o chao
-	global x_velodyne, y_velodyne, gps_x, gps_y
+	global x_velodyne, y_velodyne, gps_x, gps_y, flag_desvio, flag_volta, objeto
 	x = data.data[0]
 	y = data.data[1]
 	print 'velodyne'
-	x_velodyne = x
-	y_velodyne = y
+	if(flag_desvio==0 and flag_volta == 0 and objeto != 1):
+		x_velodyne = x
+		y_velodyne = y
+	else:
+		x_velodyne = 0
+		y_velodyne = 0
 	
 def Kinect(data):     
-	global gps_x, gps_y
+	global gps_x, gps_y, flag_desvio, flag_volta
 	global x_kinect, y_kinect, objeto
 	objeto = data.data[0]
 	x = data.data[1]
 	y = data.data[2]
 	print 'kinect'
-	if (abs(gps_y) - 1.85) < 0.15 and (abs(gps_x-x)<3 and abs(gps_y-y)<2):
-		x_kinect = x
-		y_kinect = y
-		objeto = data.data[0]
+	if (abs(gps_y) - 1.85) < 0.2:
+		if(flag_desvio==0 and flag_volta == 0):
+			x_kinect = x
+			y_kinect = y
+			objeto = data.data[0]
+		else:
+			x_kinect = 0
+			y_kinect = 0
+			objeto = data.data[0]
 	
 def GPS(data):
 	global gps_x, gps_y, objeto
@@ -170,7 +179,9 @@ def GPS(data):
 							pub_main.publish(a)
 						flag_retorno = 0
 			elif(flag_desvio == 1 and flag_volta == 1):
+					print 'cpo: voltando'
 					if(np.absolute(temp_x_ref - gps_x) < 0.03):
+						print 'cpo: terminou volta'
 						flag_desvio = 0
 						flag_volta = 0
 						x_kinect = 0
@@ -178,10 +189,23 @@ def GPS(data):
 						x_velodyne = 0
 						y_velodyne = 0
 						
-					
-						
-					#if(np.absolute(temp_x_ref - gps_x) < 0.05 and np.absolute(temp_y_ref - gps_y) < 0.05 ):
-	'''else:
+		elif(objeto==1):
+			pub_main = rospy.Publisher('/object_control', Float32MultiArray, queue_size = 1)
+			a = Float32MultiArray()
+			a.data = (objeto, x_kinect, y_kinect, 2, 180, 0, 0, 0)
+			print 'cpo: corredor'
+			flag_retorno = 0
+			while (flag_retorno != 1 and x_kinect != 0):
+				print "cpo: mandando para o cpmo do corredor", 'x: ', x_kinect, 'y: ', y_kinect
+				pub_main.publish(a)
+			flag_retorno = 0
+			flag_volta = 0
+			flag_desvio = 0
+			x_kinect = 0
+			y_kinect = 0
+			x_velodyne = 0
+			y_velodyne = 0
+	else:
 		flag_volta = 0
 		flag_desvio = 0
 		flag_retorno = 0
@@ -189,7 +213,7 @@ def GPS(data):
 		x_kinect = 0
 		y_kinect = 0
 		x_velodyne = 0
-		y_velodyne = 0'''
+		y_velodyne = 0
 		
 def talker():
 	rospy.init_node('Object_Control', anonymous = True)
