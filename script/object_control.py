@@ -80,6 +80,7 @@ def GPS(data):
 					y_velodyne = 0
 					x_kinect = 0
 					y_kinect = 0
+					flag_velodyne = 0
 				
 				if (x_velodyne != 0 and y_velodyne != 0 and x_kinect != 0 and y_kinect != 0):
 					erro_x = x_velodyne - x_kinect
@@ -122,12 +123,6 @@ def GPS(data):
 					
 			elif(flag_desvio==0 and flag_volta == 1):
 				msg_l = rospy.Publisher('/OBC_OBV', Float32MultiArray, queue_size = 1)
-				while (flag_velodyne != 1):
-					print 'cpo: controlando o flag_v'
-					pub_l = Float32MultiArray()
-					a_l = (2,0)
-					pub_l.data = a_l
-					msg_l.publish(pub_l)
 				if(temp_x_ref == 0):
 					x_velodyne = 0
 					y_velodyne = 0
@@ -144,9 +139,6 @@ def GPS(data):
 					a = Float32MultiArray()
 					a.data = (objeto, x_pub, y_pub, 2, 180, 0, 0, 0)
 					flag_retorno = 0
-					while (flag_retorno != 1):
-						print "cpo: mandando para o cpmo volta"
-						pub_main.publish(a)
 					flag_retorno = 0
 					flag_desvio = 1
 					flag_volta = 1
@@ -173,11 +165,6 @@ def GPS(data):
 						a = Float32MultiArray() #se a variacao no eixo x for menor que 30 cm pode ter um problema na tangente hiperbolica
 						a.data = (objeto, x_pub, y_pub, 2, 180, 0, 0, 0)
 						print 'cpo: antes de publicar. flag_retorno:', flag_retorno
-						flag_retorno = 0
-						while (flag_retorno != 1):
-							print "cpo: mandando para o cpmo temporario"
-							pub_main.publish(a)
-						flag_retorno = 0
 			elif(flag_desvio == 1 and flag_volta == 1):
 					print 'cpo: voltando'
 					if(np.absolute(temp_x_ref - gps_x) < 0.03):
@@ -195,9 +182,9 @@ def GPS(data):
 			a.data = (objeto, x_kinect, y_kinect, 2, 180, 0, 0, 0)
 			print 'cpo: corredor'
 			flag_retorno = 0
-			while (flag_retorno != 1 and x_kinect != 0):
-				print "cpo: mandando para o cpmo do corredor", 'x: ', x_kinect, 'y: ', y_kinect
-				pub_main.publish(a)
+			#while (flag_retorno != 1 and x_kinect != 0):
+			#	print "cpo: mandando para o cpmo do corredor", 'x: ', x_kinect, 'y: ', y_kinect
+				#pub_main.publish(a)
 			flag_retorno = 0
 			flag_volta = 0
 			flag_desvio = 0

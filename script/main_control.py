@@ -7,8 +7,10 @@ from sensor_msgs.msg import NavSatFix
 gps_x, x_ref = 0, 0
 gps_y, y_ref = 0, 0
 #(x,y,speed,frontal, traseiro,braco, recebe dos sensores)
-goals = [(0.0, -2.2, 2, 180, 0, 0, 0, 0), (0.0, -1.2, 0, 180, 0, 1, 0),(-5.7, -2.2, 2, 180, 0, 0, 0),(-8.0, -1.95, 2, 180, 0, 0, 0),(-41.75, -2.01, 2, -45, -45, 0, 1),(-42.32, -2.01, 2, -45, 0, 0, 1),(-42.88, -2.01, 2, 0, 0, 2, 1),(-50.85, -2.01, -2, 0, 0, 2, 1),(-42.72, -2.01, -3, -45, 0, 0, 1),(-41.83, -2.01, -2, 0, -45, 0, 1), (-41.5, -2.01, -2, 0, 0, 0, 1), (-39.4, -2.01, 2, 180, 0, 0, 1),(-42.0, -3.4, 2, 180, 0, 0, 1),(-52.0, -3.4, 2, 0, 0, 0, 0),(-56.0, 0, 2, 0, 0, 0, 0),(-52.0, 3.4, 2, 0, 0, 0, 0),(-42.0, 3.4, 2, 180, 0, 0, 0),(-38.0, 1.85, -2, 180, 0, 0, 1), (-41.6, 1.85, -2, 35, 35, 0, 1), (-42.55, 1.85, -2, 180, 35, 2, 1), (-42.9, 1.85, -2, 180, 0, 2, 1), (-51.0, 1.85, 2, 180, 0, 2, 1), (-43.00, 1.85, 3, 0, 45, 0, 1), (-41.5, 1.85, 2, 180, 0, 0, 1), (-38, 1.85, 2, 180, 0, 0, 0), (-9.0, 1.85, 0, 180, 0, 1, 0), (-6.31, 1.85, 2, 180, 0, 0, 0), (-3.0, 3.0, 2, 180, 0, 0, 0)] #corrigir a subida de reh
-index = len(goals)-0
+goals = [(0.0, -2.2, 2, 180, 0, 0, 0, 0), (0.0, -1.2, 0, 180, 0, 1, 0),(-5.7, -2.2, 2, 180, 0, 0, 0),(-8.0, -1.95, 2, 180, 0, 0, 0),(-41.75, -2.01, 2, -45, -45, 0, 1),(-42.32, -2.01, 2, -45, 0, 0, 1),(-42.88, -2.01, 2, 0, 0, 2, 1),(-50.85, -2.01, -2, 0, 0, 2, 1),(-42.72, -2.01, -3, -45, 0, 0, 1),(-41.83, -2.01, -2, 0, -45, 0, 1), (-41.5, -2.01, -2, 0, 0, 0, 1), (-39.4, -2.01, 2, 180, 0, 0, 1),(-42.0, -3.4, 2, 180, 0, 0, 1),(-52.0, -3.4, 2, 0, 0, 0, 0),(-56.0, 0, 2, 0, 0, 0, 0),(-52.0, 3.4, 2, 0, 0, 0, 0),(-42.0, 3.4, 2, 180, 0, 0, 0),(-38.0, 1.85, -2, 180, 0, 0, 1), (-41.6, 1.85, -2, 35, 35, 0, 1), (-42.55, 1.85, -2, 180, 35, 2, 1), (-42.9, 1.85, -2, 180, 0, 2, 1), (-51.0, 1.85, 2, 180, 0, 2, 1), (-43.00, 1.85, 3, 0, 45, 0, 1), (-41.5, 1.85, 2, 180, 0, 0, 1), (-38, 1.85, 2, 180, 0, 0, 0),(-9.0, 1.85, 0, 180, 0, 1, 0), (-6.77, 1.85, 2, 180, 0, 0, 0)(-9.0, 1.85, 0, 180, 0, 1, 0), (-6.31, 1.85, 2, 180, 0, 0, 0), (-3.0, 3.0, 2, 180, 0, 0, 0)] #corrigir a subida de reh
+
+#-6.77, 1.85, 2, 180, 0, 0, 1
+index = len(goals)-3
 x_master, y_master = 0, 0
 objeto_anterior = 111
 processando_global = 1 #eh false, 1 = 0 mudei para testar a fila
@@ -51,8 +53,15 @@ def Kinect_Coordinate(data): #data.data[0] vai ser um contador de objetos
                 front_angle = data.data[4]
                 back_angle = data.data[5]
                 flug_arm = data.data[6]
-                goals.insert(index, (x_objeto, y_objeto, speed, front_angle, back_angle, flug_arm, data.data[7]))
-                index += 1
+		if(gps_y>0):
+			goals.insert(index, (x_objeto-2.5, 1.85, speed, front_angle, back_angle, flug_arm, data.data[7]))
+			goals.insert(index+1, (x_objeto-1.0, y_objeto, speed, front_angle, back_angle, flug_arm, data.data[7]))
+		else:
+			goals.insert(index, (x_objeto+1.5, 1.95, speed, front_angle, back_angle, flug_arm, data.data[7]))
+			goals.insert(index+1, (x_objeto+0.5, y_objeto, speed, front_angle, back_angle, flug_arm, data.data[7]))
+                goals.insert(index+2, (x_objeto, y_objeto, speed, front_angle, back_angle, flug_arm, data.data[7]))
+		
+                index += 3
                 processando_global = 0
                 objeto_anterior = data.data[0]
                 mudou_global = 1
