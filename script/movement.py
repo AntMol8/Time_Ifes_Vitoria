@@ -41,10 +41,12 @@ def Detect_Roll(data):
 	
 def Detect_Fire(data):
 	global gps_map, resolution
+	
 	if (y_gps > 1):
 	                data.data[0] += 0.136
         elif (y_gps < -1):
 	        	data.data[0] -= 0.136
+			
 	x_roll = data.data[0]
 	y_roll = data.data[1]
 
