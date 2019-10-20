@@ -16,15 +16,15 @@ flag = 1
 flag_global = 1
 
 def Flag_Velodyne(data): #data.data[0] vai ser um contador de objetos
-        global flag_global
+    global flag_global
 
 	msg_l = rospy.Publisher('/velodyne_feedback', Float32MultiArray, queue_size = 1)
-        pub_l = Float32MultiArray()
-        print 'mapa13: retorno do velodyne'
-        a_l = (1,0)
-        pub_l.data = a_l
-        msg_l.publish(pub_l)
-        flag_global = data.data[0]
+    pub_l = Float32MultiArray()
+    print 'mapa13: retorno do velodyne'
+    a_l = (1, 0)
+    pub_l.data = a_l
+    msg_l.publish(pub_l)
+    flag_global = data.data[0]
 
 def GPS(GPS_data):
 	global gps_x_global
@@ -51,7 +51,7 @@ def IMU(Imu_data):
 	b = Imu_data.orientation.x
 	c = Imu_data.orientation.y
 	d = Imu_data.orientation.z
-	ref = math.sqrt((1-b**2-c**2)/2)
+	ref = math.sqrt((1-b**2-c**2) / 2)
 
 	imu_x_global = np.arctan((2*(a*b + c*d)) / (a*a - b*b - c*c + d*d))
 	imu_y_global = np.arcsin(2 * (b*d - a*c))
@@ -73,7 +73,6 @@ def callback(dado):
 		gps_x = gps_x_global
 		gps_y = gps_y_global
 		
-		#flag = 1
 		flag = flag_global
 		
 		mapa = np.zeros((10000, 3000), np.uint8)
@@ -100,7 +99,6 @@ def callback(dado):
 			coordinates = np.dot(rotz, ang_y)
 			coordinates = np.dot(rotx, coordinates)
 			x = coordinates[0]; y = coordinates[1]; z = coordinates[2]
-			
 			
 			if flag == 1:
 				if (z >= -0.25) and (1 <= x <= 3.5) and (-1.25 <= y <= 0.25):
@@ -131,12 +129,10 @@ def callback(dado):
 			
 			pub.data = (obj_x, obj_y) #talvez tenha que adicionar um terceiro elemento para servir de comparacao no cpo.py analisando se mandou o flag correto, i.e o dado com o correspondente flag
 			msg.publish(pub)
-			if(flag==1):
+			if (flag == 1):
 				print 'mapa13: PUBLICADO DO VELODYNE flag 1', obj_x, obj_y
-			elif(flag==2):
-				print 'mapa13: PUBLICADO DO VELODYNE flag 2', obj_x, obj_y
-		
-	#rospy.signal_shutdown('FIM')			
+			elif (flag == 2):
+				print 'mapa13: PUBLICADO DO VELODYNE flag 2', obj_x, obj_y			
 			
 def listener():
 	rospy.init_node('SENSOR12', anonymous = True)
