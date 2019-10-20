@@ -9,36 +9,43 @@ from rosi_defy.msg import RosiMovement
 from PIL import Image as IMG
 import cv2
 
-mapa = np.zeros([6000, 1200, 3], dtype = np.uint8)
-x1 = int(-51.825*100 + 6000); x2 = int(-2.15*100 + 6000)
-y1 = int(1.245*100 + 600); y2 = int(-1.425*100 + 600)
-cv2.rectangle(mapa, (y2, x2), (y1, x1), (255, 255, 255), -1)
+gps_map = np.zeros([6000, 1200, 3], dtype = np.uint8)
+
+#x1, x2, y1 and y2 represent the corners of the conveyor belt
+x1, x2 = int(-51.825*100 + 6000), int(-2.15*100 + 6000)
+y1, y2 = int(1.245*100 + 600), int(-1.425*100 + 600)
+
+cv2.rectangle(gps_map, (y2, x2), (y1, x1), (255, 255, 255), -1)
 x_gps, y_gps, z_gps = 0.0, 0.0, 0.0
-x_ref, y_ref = -10, -2.2
-resolucao = 0.01
+x_ref, y_ref = 0, 0
+
 back_arms_angle = 0
-front_arms_angle = 35
+front_arms_angle = 0
 speed = 2
 horizontal_reference_gps = 1
 z_quaternion_reference_gps = 0
-resolucao = 0
+resolution = 0
 
 def Detect_Roll(data):
-	global mapa, resolucao
-	x_rolo1 = int(data.data[0]/resolucao) + 6000
-	y_rolo1 = int(data.data[1]/resolucao) + 600
-	x_rolo2 = int(data.data[2]/resolucao) + 6000
-	y_rolo2 = int(data.data[3]/resolucao) + 600
-	if ((mapa[x_rolo1, y_rolo1] == (0, 0, 255)).all() or (mapa[x_rolo2, y_rolo1] == (0, 0, 255)).all() or (mapa[x_rolo1, y_rolo2] == (0, 0, 255)).all() or (mapa[x_rolo2, y_rolo2] == (0, 0, 255)).all()):
+	global gps_map, resolution
+
+	x_rolo1 = int(data.data[0]/resolution) + 6000
+	y_rolo1 = int(data.data[1]/resolution) + 600
+	x_rolo2 = int(data.data[2]/resolution) + 6000
+	y_rolo2 = int(data.data[3]/resolution) + 600
+
+	if ((gps_map[x_rolo1, y_rolo1] == (0, 0, 255)).all() or (gps_map[x_rolo2, y_rolo1] == (0, 0, 255)).all() or (gps_map[x_rolo1, y_rolo2] == (0, 0, 255)).all() or (gps_map[x_rolo2, y_rolo2] == (0, 0, 255)).all()):
 		return
 		
-	cv2.rectangle(mapa, y_rolo1, x_rolo1, y_rolo2 + 5, x_rolo2 - 5, (0, 255, 0), -1)
+	cv2.rectangle(gps_map, y_rolo1, x_rolo1, y_rolo2 + 5, x_rolo2 - 5, (0, 255, 0), -1)
 	
 def Detect_Fire(data):
-	global mapa, resolucao
-	x_rolo = data.data[0]
-	y_rolo = data.data[1]
-	cv2.rectangle(mapa, (int(y_rolo/resolucao) + 600 - 5, int(x_rolo/resolucao) + 6000 - 5), (int(y_rolo/resolucao) + 600 + 5, int(x_rolo/resolucao) + 6000 + 5), (0, 0, 255), -1)
+	global gps_map, resolution
+
+	x_roll = data.data[0]
+	y_roll = data.data[1]
+
+	cv2.rectangle(gps_map, (int(y_roll / resolution) + 600 - 5, int(x_roll / resolution) + 6000 - 5), (int(y_roll / resolution) + 600 + 5, int(x_roll / resolution) + 6000 + 5), (0, 0, 255), -1)
 	
 def Coordinates_Control(data):
 	global x_ref 
@@ -50,6 +57,7 @@ def Coordinates_Control(data):
 	speed = data.data[2]
 	front_arms_angle = data.data[3]
 	back_arms_angle = data.data[4]
+
 	if (x_ref != data.data[0] or y_ref != data.data[1]):
 		y_ref = data.data[1]
 		x_ref = data.data[0]
@@ -59,34 +67,37 @@ def Arms_Control(arms_joint_position):
 	global front_arms_angle
 	global back_arms_angle
 	
-	arm_right_front = arms_joint_position.movement_array[0].joint_var
-	arm_right_back = arms_joint_position.movement_array[1].joint_var
-	arm_left_front = arms_joint_position.movement_array[2].joint_var
-	arm_left_back = arms_joint_position.movement_array[3].joint_var
+	right_front_arm = arms_joint_position.movement_array[0].joint_var
+	right_back_arm = arms_joint_position.movement_array[1].joint_var
+	left_front_arm = arms_joint_position.movement_array[2].joint_var
+	left_back_arm = arms_joint_position.movement_array[3].joint_var
 	
 	feedback = rospy.Publisher('/rosi/command_arms_speed', RosiMovementArray, queue_size = 1)
-	if(arm_right_front<(-np.pi/2)):
-		arm_right_front = 2*np.pi + arm_right_front
-	if(arm_left_front>(np.pi/2)):
-		arm_left_front = -2*np.pi + arm_left_front
-		
-	front_arms_angle = front_arms_angle*np.pi / 180
-	back_arms_angle = back_arms_angle*np.pi / 180
-	ang_ref1 = front_arms_angle; ang_ref3 = -ang_ref1 		
-	ang_ref2 = back_arms_angle; ang_ref4 = -ang_ref2 		
 
-	erro1 = (arm_right_front-ang_ref1) * 10
-	erro3 = (ang_ref3-arm_left_front) * 10
-	erro2 = (arm_right_back-ang_ref2) * 10
-	erro4 = (ang_ref4-arm_left_back) * 10
-	speed = 0;
-	motor1 = RosiMovement(); motor1.nodeID = 1; motor1.joint_var = erro1
-	motor2 = RosiMovement(); motor2.nodeID = 2; motor2.joint_var = erro2
-	motor3 = RosiMovement(); motor3.nodeID = 3; motor3.joint_var = erro3
-	motor4 = RosiMovement(); motor4.nodeID = 4; motor4.joint_var = erro4
-	motor = RosiMovementArray();
-	motor.movement_array = (motor1, motor2, motor3, motor4)
-	feedback.publish(motor)
+	if (right_front_arm < (-np.pi / 2)):
+		right_front_arm += 2 * np.pi
+	if (left_front_arm > (np.pi / 2)):
+		left_front_arm += -2 * np.pi
+		
+	front_arms_angle *= np.pi / 180
+	back_arms_angle *= np.pi / 180
+	ang_ref1, ang_ref3 = front_arms_angle, -ang_ref1 		
+	ang_ref2, ang_ref4 = back_arms_angle, -ang_ref2 		
+
+	#calculates the difference between the ideal position and the actual position of the arms and amplifies it
+	error1 = (right_front_arm-ang_ref1) * 10
+	error3 = (ang_ref3-left_front_arm) * 10
+	error2 = (right_back_arm-ang_ref2) * 10
+	error4 = (ang_ref4-left_back_arm) * 10
+
+	speed = 0
+	front_right_engine = RosiMovement(); front_right_engine.nodeID = 1; front_right_engine.joint_var = error1
+	back_right_engine = RosiMovement(); back_right_engine.nodeID = 2; back_right_engine.joint_var = error2
+	front_left_engine = RosiMovement(); front_left_engine.nodeID = 3; front_left_engine.joint_var = error3
+	back_left_engine = RosiMovement(); back_left_engine.nodeID = 4; back_left_engine.joint_var = error4
+	engine = RosiMovementArray()
+	engine.movement_array = (front_right_engine, back_right_engine, front_left_engine, back_left_engine)
+	feedback.publish(engine)
 	
 	front_arms_angle *= 180 / np.pi
 	back_arms_angle *= 180 / np.pi
@@ -110,126 +121,121 @@ def GPS(GPS_data):
 		angle_reference = np.pi / 2
 	else:
 		angle_reference = delta_x/np.absolute(delta_x) * np.arctan(np.absolute(delta_y/delta_x))
+		
 		if (angle_reference < 0):
 			angle_reference += np.pi
+
 	if (delta_y < 0):
 		horizontal_reference_gps = -1 	
 	else:
 		horizontal_reference_gps = 1
+
 	z_quaternion_reference_gps = np.sin(angle_reference / 2)
-		
-def Parar():
-	feedback = rospy.Publisher('/rosi/command_traction_speed', RosiMovementArray, queue_size = 1)
-	motor1 = RosiMovement(); motor1.nodeID = 1; motor1.joint_var = 0.0
-	motor2 = RosiMovement(); motor2.nodeID = 2; motor2.joint_var = 0.0
-	motor3 = RosiMovement(); motor3.nodeID = 3; motor3.joint_var = 0.0
-	motor4 = RosiMovement(); motor4.nodeID = 4; motor4.joint_var = 0.0
-	motor = RosiMovementArray()
-	motor.movement_array = (motor1, motor2, motor3, motor4)
-	feedback.publish(motor)
-	rospy.sleep(2)
-	
+			
 def Orientation_Control(Imu_data):
 	global x_gps
 	global y_gps
 	global z_gps
 	global y_ref
 	global x_ref
-	global mapa	
+	global gps_map	
 	global speed
-	global z_quaternion_reference_gps, resolucao
-	global esquerda_ref, horizontal_reference_gps
+	global z_quaternion_reference_gps, resolution
+	global horizontal_reference_gps
 	
 	z_quaternion_reference = z_quaternion_reference_gps
 	horizontal_reference = horizontal_reference_gps
+
 	x = x_gps
 	y = y_gps
 	z = z_gps
+
 	feedback = rospy.Publisher('/rosi/command_traction_speed', RosiMovementArray, queue_size = 1)
-	resolucao = 0.01
-	mapa_x = int(x/resolucao) + 6000 
-	mapa_y = int(y/resolucao) + 600
+	resolution = 0.01
+	gps_map_x = int(x/resolution) + 6000 
+	gps_map_y = int(y/resolution) + 600
 	
-	if (mapa_x < 6000 and mapa_x >= 0) and (mapa_y < 1200 and mapa_y >= 0):
-		mapa[mapa_x,mapa_y] = (255, 0, 0)
-		cv2.imwrite('mapa.png', mapa)
+	if (gps_map_x < 6000 and gps_map_x >= 0) and (gps_map_y < 1200 and gps_map_y >= 0):
+		gps_map[gps_map_x,gps_map_y] = (255, 0, 0)
+		cv2.imwrite('gps_map.png', gps_map)
 
 	b = Imu_data.orientation.x
 	c = Imu_data.orientation.y
 	d = Imu_data.orientation.z
 	a = Imu_data.orientation.w
-	erro = 0.0  				
+	error = 0.0 
+
 	if (a/np.absolute(a) * d < 0):
-		esquerda_d = -1 
+		left_angle = -1 
 	else:
-		esquerda_d = 1
+		left_angle = 1
 		
-	a_dref = np.arcsin(z_quaternion_reference) * 2
-	a_d = np.arcsin(np.absolute(d)) * 2
+	angle_ref = np.arcsin(z_quaternion_reference) * 2
+	angle = np.arcsin(np.absolute(d)) * 2
 
 	if (speed < 0):
-		horizontal_reference = horizontal_reference*speed / np.absolute(speed)		
-		a_dref = np.pi - a_dref
+		horizontal_reference *= speed / np.absolute(speed)		
+		angle_ref = np.pi - angle_ref
 		
-	a_dir = horizontal_reference*a_dref - esquerda_d*a_d
+	right_orientation_angle = horizontal_reference*angle_ref - left_angle*angle
 	
-	if (a_dir < 0):
-		a_dir += 2*np.pi
+	if (right_orientation_angle < 0):
+		right_orientation_angle += 2*np.pi
 		
-	a_esq = 2*np.pi - a_dir
+	left_orientation_angle = 2*np.pi - right_orientation_angle
 	
 	constant = 5
 	
-	if (a_dir < a_esq):
-		erro = a_dir * constant
+	if (right_orientation_angle < left_orientation_angle):
+		error = right_orientation_angle * constant
 	else:
-		erro = a_esq * -constant
+		error = -left_orientation_angle * constant
 		
 	if (speed == 0):
-		erro = 0
-		erro12 = 0
-		erro34 = 0
+		error = 0
+		error12 = 0
+		error34 = 0
 	elif (speed > 0):
-		if (erro > np.absolute(speed)):
-			erro12 = np.absolute(speed)
-			erro34 = 3 * np.absolute(speed)
-		elif (erro<-np.absolute(speed)):
-			erro12 = -3 * np.absolute(speed)
-			erro34 = -np.absolute(speed)
+		if (error > np.absolute(speed)):
+			error12 = np.absolute(speed)
+			error34 = 3 * np.absolute(speed)
+		elif (error<-np.absolute(speed)):
+			error12 = -3 * np.absolute(speed)
+			error34 = -np.absolute(speed)
 		else:
-			erro12 = erro; erro34 = erro
+			error12 = error; error34 = error
 	else:
-		if (erro > np.absolute(speed)):
-			erro34 = np.absolute(speed)
-			erro12 = 3 * np.absolute(speed)
-		elif (erro<-np.absolute(speed)):
-			erro34 = -3 * np.absolute(speed)
-			erro12 = -np.absolute(speed)
+		if (error > np.absolute(speed)):
+			error34 = np.absolute(speed)
+			error12 = 3 * np.absolute(speed)
+		elif (error < -np.absolute(speed)):
+			error34 = -3 * np.absolute(speed)
+			error12 = -np.absolute(speed)
 		else:
-			erro12 = erro; erro34 = erro
+			error12 = error; error34 = error
 
 
 	speed1, speed3, speed2, speed4 = speed, speed, speed, speed
-	motor1 = RosiMovement(); motor1.nodeID = 1; motor1.joint_var = speed1 + erro12
-	motor2 = RosiMovement(); motor2.nodeID = 2; motor2.joint_var = speed2 + erro12
-	motor3 = RosiMovement(); motor3.nodeID = 3; motor3.joint_var = speed3 - erro34
-	motor4 = RosiMovement(); motor4.nodeID = 4; motor4.joint_var = speed4 - erro34
+	front_right_engine = RosiMovement(); front_right_engine.nodeID = 1; front_right_engine.joint_var = speed1 + error12
+	back_right_engine = RosiMovement(); back_right_engine.nodeID = 2; back_right_engine.joint_var = speed2 + error12
+	front_left_engine = RosiMovement(); front_left_engine.nodeID = 3; front_left_engine.joint_var = speed3 - error34
+	back_left_engine = RosiMovement(); back_left_engine.nodeID = 4; back_left_engine.joint_var = speed4 - error34
 	
-	motor = RosiMovementArray()
-	motor.movement_array = (motor1, motor2, motor3, motor4)
-	feedback.publish(motor)
+	engine = RosiMovementArray()
+	engine.movement_array = (front_right_engine, back_right_engine, front_left_engine, back_left_engine)
+	feedback.publish(engine)
 	
 	print "xref: ", x_ref, "yref: ", y_ref
 	print 'x: ', x, 'y: ', y
-	print "erro = d_ref - d: ", erro
-	print "erro12: ", erro12
-	print "erro34: ", erro34
-	print "a_dir: ", a_dir
-	print "a_esq: ", a_esq
-	print "a_dref: ", a_dref
+	print "error = d_ref - d: ", error
+	print "error12: ", error12
+	print "error34: ", error34
+	print "right_orientation_angle: ", right_orientation_angle
+	print "left_orientation_angle: ", left_orientation_angle
+	print "angle_ref: ", angle_ref
 	print "horizontal_ref: ", horizontal_reference
-	print "a_d = z: ", a_d
-	print "esquerda_d: ", esquerda_d
+	print "angle = z: ", angle
+	print "left_angle: ", left_angle
 	print '-------------------------'
 	
 def talker():
@@ -247,4 +253,3 @@ if __name__ == '__main__':
         talker()
     except rospy.ROSInterruptException:
         pass
-
