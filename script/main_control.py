@@ -148,7 +148,7 @@ def Fire_Coordinate(data): #receives data from ur5Camera.py and sends info to ar
         previous_object = data.data[0]
         global_changed = 1
 
-def talker():
+def talker(): #Inits nodes and declares subscribers
 	rospy.init_node('Main_Control', anonymous = True)
 	rospy.Subscriber('/sensor/gps', NavSatFix, GPS)
 	rospy.Subscriber('/object_control', Float32MultiArray, Kinect_Coordinate)
