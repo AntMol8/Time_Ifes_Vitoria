@@ -1,10 +1,8 @@
 #!/usr/bin/env python
 import numpy as np
 import rospy
-import math
 from sensor_msgs.msg import Image
 from sensor_msgs.msg import NavSatFix
-from rosi_defy.msg import HokuyoReading
 from std_msgs.msg import Float32MultiArray
 import cv2
 
