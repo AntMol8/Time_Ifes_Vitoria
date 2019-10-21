@@ -114,7 +114,7 @@ def Velodyne(dado):			#detects objects using velodyne and publishes to object_co
 						obj_x = x
 						obj_y = y
 		
-		if obj_x != 0:
+		if obj_x != 0:					#corrects the difference between gps and velodyne reference
 			if gps_y_global	> 0:
 				obj_x = gps_x - obj_x - 0.2425
 				obj_y = gps_y - obj_y
