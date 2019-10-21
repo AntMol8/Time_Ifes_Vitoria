@@ -29,6 +29,7 @@ def pathfinder():
 	rospy.init_node('DETECT_ROLL', anonymous = True)
 	rospy.Subscriber('/sensor/gps', NavSatFix, position)
 	rospy.Subscriber('/sensor/hokuyo', HokuyoReading, callback)
+	rospy.Subscriber('/armBrain', Int8, fix_touch)
 	flag = rospy.Publisher('/detect_roll', Float32MultiArray, queue_size=1)
 	pub = Float32MultiArray()
 	pub.data = 0
@@ -84,7 +85,6 @@ def position(GPS_data):
 						print("AA")
 						roll = False
 						del coordinates[:]
-						n = 0
 						return
 
 				print(pub)
@@ -97,8 +97,6 @@ def position(GPS_data):
 				n = 0
 				
 		roll = False
-		if len(coordinates) > 2:
-			del coordinates[:]
 
 
 def callback(Hokuyo_data):
