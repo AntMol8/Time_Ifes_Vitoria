@@ -14,7 +14,7 @@ previous_fires_y = []
 lower = np.array([0, 150, 150])
 upper = np.array([50, 255, 255])
 
-def position(GPS_data):
+def position(GPS_data): #gets data from the GPS and publishes fire coordinates when fire is detected
 	global previous_fires_x
 	global previous_fires_y
 	global fire				#Receives coordinates x and y from the gps
@@ -47,10 +47,10 @@ def position(GPS_data):
 		flag.publish(pub)
 		previous_fires_x.append(pos_x)
 		previous_fires_y.append(pos_y)
-
+		
 		fire = 0
 
-def callback_u(datas):
+def callback_u(datas): # analyses ur5Camera and identifies fire based on RGB camera
 	global aux, lower, upper, pos_z
 	global fire
 
