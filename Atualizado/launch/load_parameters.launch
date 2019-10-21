@@ -1,0 +1,5 @@
+<launch>
+
+	<rosparam command="load" file="$(find Time_Ifes_Vitoria)/config/simulation_parameters.yaml" />
+
+</launch>
