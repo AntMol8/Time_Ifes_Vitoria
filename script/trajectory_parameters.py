@@ -55,16 +55,16 @@ def GPS(data):
 	gps_x = data.latitude
 	gps_y = data.longitude
 
-    if (stop_flag == 1):
-        speed = 0
-    elif (((np.absolute(gps_x - x_ref) < 0.05) and (np.absolute(gps_y - y_ref) < 0.10)) or (np.absolute(gps_x - x_ref) < 0.02)):
-        #f(x) = a * tgh(-b (x+(2.6466)/(b)-d)) + a + c
-        x_ref = gps_x + resolution
-        arg = -b * (x_ref+constant-gps_x_ref)
-        y_ref = math.tanh(arg) + 0
-        y_ref = amplitude * (y_ref + 1)
-        y_ref += gps_y_ref
-        print "Mudou", "amplitude ", amplitude, 'b: ', b, 'constant: ', constant, 'gps_y_ref: ', gps_y_ref, 'gps_x_ref: ', gps_x_ref, 'y_ref: ', y_ref, 'x_ref: ', x_ref
+    	if (stop_flag == 1):
+		speed = 0
+    	elif (((np.absolute(gps_x - x_ref) < 0.05) and (np.absolute(gps_y - y_ref) < 0.10)) or (np.absolute(gps_x - x_ref) < 0.02)):
+		#f(x) = a * tgh(-b (x+(2.6466)/(b)-d)) + a + c
+		x_ref = gps_x + resolution
+		arg = -b * (x_ref+constant-gps_x_ref)
+		y_ref = math.tanh(arg) + 0
+		y_ref = amplitude * (y_ref + 1)
+		y_ref += gps_y_ref
+		print "Mudou", "amplitude ", amplitude, 'b: ', b, 'constant: ', constant, 'gps_y_ref: ', gps_y_ref, 'gps_x_ref: ', gps_x_ref, 'y_ref: ', y_ref, 'x_ref: ', x_ref
         
 	msg = rospy.Publisher('/trajectory_parameters', Float32MultiArray, queue_size = 1)
 	pub = Float32MultiArray()
