@@ -73,10 +73,6 @@ def callback_u(datas): # analyses ur5Camera and identifies fire based on RGB cam
 		img[py - 1: py + 1, px - 1: px + 1] = [0, 255, 0]
 		cv2.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), 2)
 	
-	if len(countours) > 0:
-		print 'FOGO'
-		fogo = 1
-		
 	cv2.imshow('img', img)
 
 	if cv2.waitKey(1) & 0xFF == ord('q'):
