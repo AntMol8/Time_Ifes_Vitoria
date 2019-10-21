@@ -153,7 +153,7 @@ def Orientation_Control(Imu_data):
 	global speed
 	global z_quaternion_reference_gps, resolution
 	global horizontal_reference_gps
-	
+	#calculates orientation and adjust with the reference angle
 	z_quaternion_reference = z_quaternion_reference_gps
 	horizontal_reference = horizontal_reference_gps
 
