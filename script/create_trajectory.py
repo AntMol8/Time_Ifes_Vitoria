@@ -24,20 +24,21 @@ def Main_Control_Parameters(data):
 
 	core_flag = data.data[0]
 	stop_flag = data.data[1]
-    object_x = data.data[2]
-    object_y = data.data[3]
-    speed = data.data[4]
-    front_angle = data.data[5]
-    back_angle = data.data[6]
+	object_x = data.data[2]
+	object_y = data.data[3]
+	speed = data.data[4]
+	front_angle = data.data[5]
+	back_angle = data.data[6]
         
-    gps_x_ref = gps_x
-    gps_y_ref = gps_y
-    slave_msg = rospy.Publisher('/create_trajectory_feedback', Float32MultiArray, queue_size = 1)
-    slave_publication = Float32MultiArray()
-    print 'create_trajectory: recebeu do main_control'
+	gps_x_ref = gps_x
+	gps_y_ref = gps_y
+	
+	slave_msg = rospy.Publisher('/create_trajectory_feedback', Float32MultiArray, queue_size = 1)
+	slave_publication = Float32MultiArray()
+	print 'create_trajectory: recebeu do main_control'
 	print 'create_trajectory: x: ', data.data[2], 'y: ', data.data[3]
-    slave_publication.data = (1, 0)
-    slave_msg.publish(slave_publication)
+	slave_publication.data = (1, 0)
+	slave_msg.publish(slave_publication)
 	
 def GPS(data): #para o calculo da orientacao tem que saber a orientacao
 	global object_x, object_y, speed, front_angle, back_angle
@@ -49,27 +50,27 @@ def GPS(data): #para o calculo da orientacao tem que saber a orientacao
 	gps_y = data.longitude
 	delta_x = gps_x - object_x #exchanges gps_x for gps_x_ref
 
-    if (abs(delta_x) > 0.3):
-        #b is a constant used in the hyberbolic tangent
-        b = 2.646652412 / (delta_x/np.absolute(delta_x)*np.absolute(abs(delta_x)-0.3)/2) #0.3 eh para dar uma margem de seguranca
-    else:
-        b = 2.646652412 / (delta_x/np.absolute(delta_x)*np.absolute(abs(delta_x))/2)
-    delta_y = -gps_y + object_y #exchanges gps_y for gps_y_ref
+	if (abs(delta_x) > 0.3):
+		#b is a constant used in the hyberbolic tangent
+		b = 2.646652412 / (delta_x/np.absolute(delta_x)*np.absolute(abs(delta_x)-0.3)/2) #0.3 eh para dar uma margem de seguranca
+		else:
+			b = 2.646652412 / (delta_x/np.absolute(delta_x)*np.absolute(abs(delta_x))/2)
+			delta_y = -gps_y + object_y #exchanges gps_y for gps_y_ref
         
-    if (delta_x < 0):
-        orientation = 1 #manda no canal de comunicacao com o mestre
-    else:
-        orientation = -1
+	if (delta_x < 0):
+		orientation = 1 #manda no canal de comunicacao com o mestre
+	else:
+		orientation = -1
                 
-    amplitude = delta_y / 2
-    resolution = orientation * 0.15
-    msg = rospy.Publisher('/create_trajetory', Float32MultiArray, queue_size = 10)
-    pub = Float32MultiArray()
-    pub.data = (stop_flag, resolution, amplitude, b, speed, front_angle, back_angle, gps_x_ref, gps_y_ref)
+	amplitude = delta_y / 2
+	resolution = orientation * 0.15
+	msg = rospy.Publisher('/create_trajetory', Float32MultiArray, queue_size = 10)
+	pub = Float32MultiArray()
+	pub.data = (stop_flag, resolution, amplitude, b, speed, front_angle, back_angle, gps_x_ref, gps_y_ref)
 
-    if (core_flag != 0):
-    	print 'create_trajectory: mandou para trajectory_parameters'
-	    msg.publish(pub)
+	if (core_flag != 0):
+		print 'create_trajectory: mandou para trajectory_parameters'
+		msg.publish(pub)
         
 	core_flag = 0
 
