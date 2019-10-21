@@ -6,7 +6,7 @@ from sensor_msgs.msg import NavSatFix
 from std_msgs.msg import Float32MultiArray
 import cv2
 
-pos_x, pos_y, pos_z = 0.0, 0.0, 0.0, 0.0, 0.0
+pos_x, pos_y, pos_z = 0.0, 0.0, 0.0
 fire = 0					#flag that represents if the camera has found fire or not
 previous_fires_x = []
 previous_fires_y = []
