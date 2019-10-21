@@ -108,7 +108,7 @@ def interpreter(changeReadValue):
 		ang = 0
 		rospy.sleep(1.5)
 
-		while z < 0.2 or ang < 0.3:
+		while (z < 0.2 or ang < 0.3) and ang < 2:
 			ray.joint_variable = [yawCorrection + math.radians(90), terrainCorrection + ang, 0, -ang, math.radians(-90), 0]
 			ang += 0.001
 			pub.publish(ray)
