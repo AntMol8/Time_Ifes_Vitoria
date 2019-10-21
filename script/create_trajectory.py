@@ -53,9 +53,9 @@ def GPS(data): #para o calculo da orientacao tem que saber a orientacao
 	if (abs(delta_x) > 0.3):
 		#b is a constant used in the hyberbolic tangent
 		b = 2.646652412 / (delta_x/np.absolute(delta_x)*np.absolute(abs(delta_x)-0.3)/2) #0.3 eh para dar uma margem de seguranca
-		else:
-			b = 2.646652412 / (delta_x/np.absolute(delta_x)*np.absolute(abs(delta_x))/2)
-			delta_y = -gps_y + object_y #exchanges gps_y for gps_y_ref
+	else:
+		b = 2.646652412 / (delta_x/np.absolute(delta_x)*np.absolute(abs(delta_x))/2)
+		delta_y = -gps_y + object_y #exchanges gps_y for gps_y_ref
         
 	if (delta_x < 0):
 		orientation = 1 #manda no canal de comunicacao com o mestre
