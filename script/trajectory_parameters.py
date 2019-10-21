@@ -5,7 +5,7 @@ from std_msgs.msg import Float32MultiArray
 from sensor_msgs.msg import NavSatFix
 import math
 
-resolution = -0.15 #10 cm
+resolution = -0.15 		#10 cm
 b = 2.0				#b is a constant used in the hyberbolic tangent
 constant = 2.646652412 / b 	#empirical constant based on the object's distance value
 amplitude = 0
