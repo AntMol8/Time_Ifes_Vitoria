@@ -49,7 +49,6 @@ def position(GPS_data):
 	
 	pos_x = GPS_data.latitude
 	pos_y = GPS_data.longitude
-	check = 0
 
 	if (roll):
 	        if(pos_y > 1):
@@ -85,6 +84,7 @@ def position(GPS_data):
 						print("AA")
 						roll = False
 						del coordinates[:]
+						n = 0
 						return
 
 				print(pub)
