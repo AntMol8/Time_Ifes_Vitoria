@@ -124,7 +124,7 @@ def GPS(data): #Controls what elements should be removed from goals array by com
                         front_angle = goals[index-1][3]
                         back_angle = goals[index-1][4]
                 
-                a_l = (previous_object, flag_parar, x_ref, y_ref, speed, front_angle, back_angle)
+                a_l = (previous_object, stop_flag, x_ref, y_ref, speed, front_angle, back_angle)
                 pub_l.data = a_l
 
                 while (return_flag != 1 and len(goals) != 0):
