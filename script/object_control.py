@@ -16,17 +16,17 @@ y_desvio_ref = 0
 temp_x_ref = 0
 temp_y_ref = 0
 
-def Velodyne_Feedback(data):
+def Velodyne_Feedback(data): #Feedback from velodyne about path alteration
         global flag_velodyne
 	
 	flag_velodyne = data.data[0]
 
-def MC_Feedback(data):
+def MC_Feedback(data): # feedback from main control about path alteration
         global flag_retorno
 
 	flag_retorno = data.data[0]
 
-def Velodyne(data): #precisa corrigir o problema no velodyne no cenario caso 1.ttt, com o objeto pequeno, aparentemente ele identifica uma parte da lateral na programacao jah estava previsto, mas nao funcionou corretamente- recomendaria usar o rviz junto com o launch para testar se ele nao ve o chao
+def Velodyne(data): #gets data from velodyne to initiate the change in course to avoid obstacles
 	global x_velodyne, y_velodyne, gps_x, gps_y, flag_desvio, flag_volta, objeto, x_kinect
 	x = data.data[0]
 	y = data.data[1]
@@ -38,7 +38,7 @@ def Velodyne(data): #precisa corrigir o problema no velodyne no cenario caso 1.t
 		x_velodyne = 0
 		y_velodyne = 0
 	
-def Kinect(data):     
+def Kinect(data):  #gets data from kinect to initiate the change in course to avoid obstacles
 	global gps_x, gps_y, flag_desvio, flag_volta
 	global x_kinect, y_kinect, objeto
 	objeto = data.data[0]
@@ -202,7 +202,7 @@ def GPS(data):
 		x_velodyne = 0
 		y_velodyne = 0
 		
-def talker():
+def talker(): #Inits nodes and subscribers
 	rospy.init_node('Object_Control', anonymous = True)
 	rospy.Subscriber('/sensor/gps', NavSatFix, GPS)
 	rospy.Subscriber('/object_velodyne', Float32MultiArray, Velodyne)
