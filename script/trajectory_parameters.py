@@ -7,7 +7,7 @@ import math
 
 resolution = -0.15 #10 cm
 b = 2.0				#b is a constant used in the hyberbolic tangent
-constant = 2.646652412 / b #constantes de natureza empirica baseada no valor da distancia do objeto
+constant = 2.646652412 / b 	#empirical constant based on the object's distance value
 amplitude = 0
 x_ref, y_ref = -5, -2
 stop_flag = 0
@@ -17,6 +17,7 @@ back_angle = 0
 gps_x_ref, gps_y_ref = 0, -2
 
 def Trajectory_Parameters(data):
+	#Parametrizes the hyberbolic tangent based on the information from create_trajectory
 	global speed, front_angle, back_angle
 	global amplitude
 	global b, constant
@@ -24,7 +25,7 @@ def Trajectory_Parameters(data):
 	global gps_x_ref, gps_y_ref
 	global x_ref, y_ref, resolution
 
-	if (gps_x_ref != data.data[7]): #-------acho que precisa de mais coisa
+	if (gps_x_ref != data.data[7]):
 		stop_flag = data.data[0]
 		resolution = data.data[1]
 		amplitude = data.data[2] 
@@ -41,9 +42,9 @@ def Trajectory_Parameters(data):
 		y_ref = math.tanh(arg) + 0
         	y_ref = amplitude * (y_ref+1)
         	y_ref += gps_y_ref
-        	print 'trajectory_parameters: recebeu do create_trajectory'
 
 def GPS(data):
+	#Publishes information to movement so the robot can follow and hyperbolic tangent trajectory
 	global resolution
 	global constant, amplitude
 	global b
@@ -64,7 +65,6 @@ def GPS(data):
 		y_ref = math.tanh(arg) + 0
 		y_ref = amplitude * (y_ref + 1)
 		y_ref += gps_y_ref
-		print "Mudou", "amplitude ", amplitude, 'b: ', b, 'constant: ', constant, 'gps_y_ref: ', gps_y_ref, 'gps_x_ref: ', gps_x_ref, 'y_ref: ', y_ref, 'x_ref: ', x_ref
         
 	msg = rospy.Publisher('/trajectory_parameters', Float32MultiArray, queue_size = 1)
 	pub = Float32MultiArray()
