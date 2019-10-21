@@ -15,17 +15,16 @@ synchronizer = 50
 flag = 1
 global_flag = 1
 
-def Flag_Velodyne(data): #data.data[0] vai ser um contador de objetos
+def Flag_Velodyne(data):		#receives a flag from object_control to know what to identify
     global global_flag
 
     msg = rospy.Publisher('/velodyne_feedback', Float32MultiArray, queue_size = 1)
     pub = Float32MultiArray()
-    print 'mapa13: retorno do velodyne'
     pub.data = (1, 0)
     msg.publish(pub)
     global_flag = data.data[0]
 
-def GPS(GPS_data):
+def GPS(GPS_data):			#gets GPS data
 	global gps_x_global
 	global gps_y_global
 	global gps_z_global
@@ -37,7 +36,7 @@ def GPS(GPS_data):
 	gps_y_global = GPS_data.longitude
 	gps_z_global = GPS_data.altitude
 
-def IMU(Imu_data):
+def IMU(Imu_data):			#gets IMU data
 	global imu_x_global
 	global imu_y_global
 	global imu_z_global
@@ -50,13 +49,13 @@ def IMU(Imu_data):
 	b = Imu_data.orientation.x
 	c = Imu_data.orientation.y
 	d = Imu_data.orientation.z
-	ref = math.sqrt((1-b**2-c**2) / 2)
+	ref = math.sqrt((1 - b**2 - c**2) / 2)
 
 	imu_x_global = np.arctan((2*(a*b + c*d)) / (a*a - b*b - c*c + d*d))
 	imu_y_global = np.arcsin(2 * (b*d - a*c))
 	imu_z_global = np.arctan((2*(a*d + c*b)) / (a*a + b*b - c*c - d*d))
 
-def callback(dado):
+def Velodyne(dado):			#detects objects using velodyne and publishes to object_control
 	global imu_x_global
 	global imu_y_global
 	global imu_z_global
@@ -67,12 +66,12 @@ def callback(dado):
 	global global_flag
 	global synchronizer
 	
-	if (synchronizer > 50):
+	if (synchronizer > 50):			#synchronize the velodyne with the IMU and the GPS
 		synchronizer = 0
 		gps_x = gps_x_global
 		gps_y = gps_y_global
 		
-		flag = global_flag
+		flag = global_flag		#saves the flag state to avoid changes during execution 
 		
 		mapa = np.zeros((10000, 3000), np.uint8)
 
@@ -88,8 +87,10 @@ def callback(dado):
 
 		for i in range(0, len(dado.data), 12):
 			value_x = unpack('f', dado.data[i: i+4])[0]
-			value_z = unpack('f', dado.data[i+8: i+12])[0]
+			value_z = unpack('f', dado.data[i+8: i+12])[0]		#unpack velodyne data to use in code
 			value_y = unpack('f', dado.data[i+4: i+8])[0]
+			
+			#rotates velodyne plane to line up with the world plane
 			ang = np.array([[value_x], [value_y], [value_z]])
 			rotz = np.array([[np.cos(imu_z), -np.sin(imu_z), 0], [np.sin(imu_z), np.cos(imu_z), 0], [0, 0, 1]])
 			rotx = np.array([[1, 0, 0], [0, np.cos(imu_x), -np.sin(imu_x) ], [0, np.sin(imu_x), np.cos(imu_x)]])
@@ -100,14 +101,14 @@ def callback(dado):
 			x = coordinates[0]; y = coordinates[1]; z = coordinates[2]
 			
 			if flag == 1:
-				if (z >= -0.25) and (1 <= x <= 3.5) and (-1.25 <= y <= 0.25):
+				if (z >= -0.25) and (1 <= x <= 3.5) and (-1.25 <= y <= 0.25):	#detects object beginning
 					mapa[int(x*100 + 5000), int(y*100 + 1500)] = 255
 					if y < obj_y:
 						obj_y = y
 						obj_x = x
 				
 			elif flag == 2:
-				if (z >= -0.25) and (0 <= x <= 3) and (1 > y > 0.3):
+				if (z >= -0.25) and (0 <= x <= 3) and (1 > y > 0.3):	#detects object end
 					mapa[int(x*100 + 5000), int(y*100 + 1500)] = 255
 					if x > obj_x:
 						obj_x = x
@@ -126,18 +127,13 @@ def callback(dado):
 					obj_y -= 0.65
 			
 			
-			pub.data = (obj_x, obj_y) #talvez tenha que adicionar um terceiro elemento para servir de comparacao no cpo.py analisando se mandou o flag correto, i.e o dado com o correspondente flag
-			msg.publish(pub)
-			
-			if (flag == 1):
-				print 'mapa13: PUBLICADO DO VELODYNE flag 1', obj_x, obj_y
-			elif (flag == 2):
-				print 'mapa13: PUBLICADO DO VELODYNE flag 2', obj_x, obj_y			
+			pub.data = (obj_x, obj_y)
+			msg.publish(pub)		
 			
 def listener():
 	rospy.init_node('SENSOR12', anonymous = True)
 	rospy.Subscriber('/sensor/imu', Imu, IMU)
-	rospy.Subscriber('/sensor/velodyne', PointCloud2, callback)
+	rospy.Subscriber('/sensor/velodyne', PointCloud2, Velodyne)
 	rospy.Subscriber('/OBC_OBV', Float32MultiArray, Flag_Velodyne)
 	rospy.Subscriber('/sensor/gps', NavSatFix, GPS)
 	rospy.spin()
