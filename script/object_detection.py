@@ -61,17 +61,17 @@ def callback(datas):
 			
 		# Method to find one end of the obstacle
 		for k in range(480):
-		   if imagem[k][10] != 255:
-			k -= 30
-			break
+			if imagem[k][10] != 255:
+				k -= 30
+				break
 
 		for l in range(380):
-		    if imagem[k - 10][l] != 255 and begin == 0:
-		    	begin = l
-		    if imagem[k - 10][l] == 255 and begin != 0 and void == 0:
-		    	void = l + 10
-		    	is_void = True
-		    	break
+			if imagem[k - 10][l] != 255 and begin == 0:
+				begin = l
+			if imagem[k - 10][l] == 255 and begin != 0 and void == 0:
+				void = l + 10
+				is_void = True
+				break
 		    	
 		# Identification of the restrict area
 		if begin != 0:
@@ -83,14 +83,14 @@ def callback(datas):
 				    
 			# Calculate the the average distance of the region of pixels
 			for m in range (k - 10, k):
-			    for n in range(begin, begin + 10):
-				total += 1
-				valor_medio += imagem[m][n + 30]
-				dist_media += dist[m][n + 30]
-				dist_esc += dist[m][n]
-				imagem [m][n] = 0
+		    		for n in range(begin, begin + 10):
+					total += 1
+					valor_medio += imagem[m][n + 30]
+					dist_media += dist[m][n + 30]
+					dist_esc += dist[m][n]
+					imagem [m][n] = 0
 
-			# Indentification of the stair
+			# Identification of the stair
 			if valor_medio / total > 240:
 				for o in range(k, 480):
 					if imagem[o][begin] != 255:
@@ -111,16 +111,6 @@ def callback(datas):
 					# Calculates the destination spot
 					dest_x = -dist_esc/(total*1000) + gps_x_global + 1
 					dest_y = desv/1000 + gps_y_global
-
-					if dist_esc / total < 3000 and dist_esc / total > 2800:
-						dest_x_global += dest_x
-						dest_y_global += dest_y
-						total_g += 1
-					elif total_g != 0 and dist_esc / total < 2800:
-						dest_x_global /= total_g
-						dest_y_global /= total_g
-					    dest_y_stair = dest_y_global + 1.0						
-
 			else:
 				if is_void:
 				    # Calculates the destination spot
