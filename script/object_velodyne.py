@@ -18,7 +18,7 @@ flag_global = 1
 def Flag_Velodyne(data): #data.data[0] vai ser um contador de objetos
     global flag_global
 
-	msg_l = rospy.Publisher('/velodyne_feedback', Float32MultiArray, queue_size = 1)
+    msg_l = rospy.Publisher('/velodyne_feedback', Float32MultiArray, queue_size = 1)
     pub_l = Float32MultiArray()
     print 'mapa13: retorno do velodyne'
     a_l = (1, 0)
