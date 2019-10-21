@@ -12,10 +12,13 @@ from PIL import Image as IMG
 data_x = []
 data_y = []
 data_z = []
+
 # variables that hold the GPS coordinates
 pos_x, pos_y = 0.0, 0.0
+
 # holds the last output from the Hokuyo
 memory = ()
+
 # indicates that the beggining or the end of the roll has been identified
 roll = False
 
@@ -66,8 +69,12 @@ def position(GPS_data): #receives data from GPS. Controls the publishing of roll
 	
 	pos_x = GPS_data.latitude
 	pos_y = GPS_data.longitude
-
+	
+	# checks if roll has been detected
 	if (roll):
+		
+		# rolls always have coordinates that correspond to the edges of the conveyor belt.
+		# checks if robot is either to the right or the left of the robot, and assigns y pos of the roll detected accordingly
 	        if(pos_y > 1):
 	                position_y = 1.245
 	                position_x = pos_x + 0.136
@@ -77,33 +84,32 @@ def position(GPS_data): #receives data from GPS. Controls the publishing of roll
 	       	else:
 	       		print("error")
 	       		return
-	       	
-		for i in range(0, len(previous_roll_x), 2):
-			try:
-				if (coordinates[0] + 0.1 > previous_roll_x[i] and coordinates[0] - 0.1 < previous_roll_x[i]) and (coordinates[1] + 0.1 > previous_roll_y[i] and coordinates[1] - 0.1 < previous_roll_y[i]):
-					print("AA")
-					
-			except:
-				break
 
 		print(position_x, position_y)
 
+		# checks if a beginning edge has been detected
+		#if it has, assures that the edge detected is a closing edge. In case no, ignores data
 		if condition != n:
 			n += 1
+			
+			# adds coordinates of the edge detected to coordinates, where they are held temporarily
 			coordinates.append(position_x)
 			coordinates.append(position_y)
 			print coordinates
-
+			
+			# if there are 4 coordinates, moves to publishing
 			if (n == 2):
 				pub.data = coordinates
+				# checks if roll has been previoulsy detected
 				for i in range(0, len(previous_roll_x), 2):
 					if (coordinates[0] + 0.2 > previous_roll_x[i] and coordinates[0] - 0.2 < previous_roll_x[i]) and (coordinates[1] + 0.2 > previous_roll_y[i] and coordinates[1] - 0.2 < previous_roll_y[i]):
 						print("AA")
+						# in case roll has been detected, ends function and erases coordinates
 						roll = False
 						del coordinates[:]
 						n = 0
 						return
-
+				#publishes roll's coordinates and adds data to previously detected rolls
 				print(pub)
 				flag.publish(pub)
 				previous_roll_x.append(coordinates[0])
@@ -167,20 +173,29 @@ def callback(Hokuyo_data):
 				#In case there is, checks if the structure has the shape of the top of the roll
 				j = i
 				while j < (len(data_y) - 1):
+					# checks for the form of the edge of the roll (circular)
 					if (abs(data_x[i] - data_x[j]) <= 0.1 and abs(data_x[i] - data_x[j]) >= 0.04 and abs(data_y[i] - data_y[j]) > 0.01 and abs(data_y[i] - data_y[j]) < 0.8):
 						if (data_x[i] - data_x[j]) < 0:
+							# checks if edge is an opening edge (crescent curvature) or end edge (decrescent curvature) 
 							if condition == 0 and abs(pos_x - mark_spot) > 0.18 :
 								print("ABRE")
 								print(i, j)
+								
+								# gets coordinates from gps at the moment of detection
+								# makes program look for end edge
 								mark_spot = pos_x
 								condition = 1
 								roll = True
 							break
 						elif (data_x[i] - data_x[j]) > 0 and condition == 1:
+							# only enters this condition after opening edge has been detected
 							if condition == 1:
+								# checks if distance from opening to end edges is greater than 5 cm
+								# if not, just ignores end coordinate
 								if abs(pos_x - mark_spot) > 0.05:
 									print("FECHA")
 									print(i, j)
+									#sets program to look for opening edges
 									condition = 0
 									roll = True
 							break
@@ -193,7 +208,8 @@ def callback(Hokuyo_data):
 		if (condition == 1):
 			print mark_spot
 			print pos_x
-
+			
+			# if the robot has moved for more than 15 cm after detecting opening edge, determines end edge is its current positioning
 			if (abs(pos_x - mark_spot) > 0.15):
 				print("FECHA")
 				condition = 0
