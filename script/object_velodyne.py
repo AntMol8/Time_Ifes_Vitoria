@@ -11,28 +11,27 @@ from struct import unpack, pack
 
 imu_x_global, imu_y_global, imu_z_global = 0, 0, 0
 gps_x_global, gps_y_global, gps_z_global = 0.0, 0.0, 0.0
-inn = 50
+synchronizer = 50
 flag = 1
-flag_global = 1
+global_flag = 1
 
 def Flag_Velodyne(data): #data.data[0] vai ser um contador de objetos
-    global flag_global
+    global global_flag
 
-    msg_l = rospy.Publisher('/velodyne_feedback', Float32MultiArray, queue_size = 1)
-    pub_l = Float32MultiArray()
+    msg = rospy.Publisher('/velodyne_feedback', Float32MultiArray, queue_size = 1)
+    pub = Float32MultiArray()
     print 'mapa13: retorno do velodyne'
-    a_l = (1, 0)
-    pub_l.data = a_l
-    msg_l.publish(pub_l)
-    flag_global = data.data[0]
+    pub.data = (1, 0)
+    msg.publish(pub)
+    global_flag = data.data[0]
 
 def GPS(GPS_data):
 	global gps_x_global
 	global gps_y_global
 	global gps_z_global
-	global inn
+	global synchronizer
 	
-	inn += 1
+	synchronizer += 1
 	
 	gps_x_global = GPS_data.latitude
 	gps_y_global = GPS_data.longitude
@@ -43,9 +42,9 @@ def IMU(Imu_data):
 	global imu_y_global
 	global imu_z_global
 	global orientation
-	global inn
+	global synchronizer
 	
-	inn += 1
+	synchronizer += 1
 	
 	a = Imu_data.orientation.w
 	b = Imu_data.orientation.x
@@ -65,15 +64,15 @@ def callback(dado):
 	global gps_y_global
 	global gps_z_global
 	global orientation
-	global flag_global
-	global inn
+	global global_flag
+	global synchronizer
 	
-	if (inn > 50):
-		inn = 0
+	if (synchronizer > 50):
+		synchronizer = 0
 		gps_x = gps_x_global
 		gps_y = gps_y_global
 		
-		flag = flag_global
+		flag = global_flag
 		
 		mapa = np.zeros((10000, 3000), np.uint8)
 
@@ -129,6 +128,7 @@ def callback(dado):
 			
 			pub.data = (obj_x, obj_y) #talvez tenha que adicionar um terceiro elemento para servir de comparacao no cpo.py analisando se mandou o flag correto, i.e o dado com o correspondente flag
 			msg.publish(pub)
+			
 			if (flag == 1):
 				print 'mapa13: PUBLICADO DO VELODYNE flag 1', obj_x, obj_y
 			elif (flag == 2):
