@@ -26,32 +26,36 @@ horizontal_reference_gps = 1
 z_quaternion_reference_gps = 0
 resolution = 0
 
-def Detect_Roll(data):
+def Detect_Roll(data): # Receives data from detect_roll script and prints rolls on map
 	global gps_map, resolution
-
+	
+	# gets rolls opening and closing edges
 	x_roll_1 = int(data.data[0]/resolution) + 6000
 	y_roll_1 = int(data.data[1]/resolution) + 600
 	x_roll_2 = int(data.data[2]/resolution) + 6000
 	y_roll_2 = int(data.data[3]/resolution) + 600
 
+	# before painting the map, checks if the zone to be painted is not red so that it does not overlay the marked fires
 	if ((gps_map[x_roll_1, y_roll_1] == (0, 0, 255)).all() or (gps_map[x_roll_2, y_roll_1] == (0, 0, 255)).all() or (gps_map[x_roll_1, y_roll_2] == (0, 0, 255)).all() or (gps_map[x_roll_2, y_roll_2] == (0, 0, 255)).all()):
 		return
-		
+	# prints roll 	
 	cv2.rectangle(gps_map, (int(data.data[1]/resolution) + 600 - 5, int(data.data[0]/resolution) + 6000 - 5), (int(data.data[3]/resolution) + 600 + 5, int(data.data[2]/resolution) + 6000 + 5), (0, 255, 0), -1)
 	
-def Detect_Fire(data):
+def Detect_Fire(data): # receives data from ur5Camera with the fire's coordinates and prints fires on map
 	global gps_map, resolution
-
+	
+	# fixes fire coordinates, compensating the difference between the ur5Camera and the gps
 	if (y_gps > 1):
 		a = data.data[0] + 0.136
 	elif (y_gps < -1):
 		a = data.data[0] - 0.136
 	else:
 		a = data.data[0]
-
+	
 	x_roll = a
 	y_roll = data.data[1]
-
+	
+	# prints fire
 	cv2.rectangle(gps_map, (int(y_roll / resolution) + 600 - 5, int(x_roll / resolution) + 6000 - 5), (int(y_roll / resolution) + 600 + 5, int(x_roll / resolution) + 6000 + 5), (0, 0, 255), -1)
 	
 def Coordinates_Control(data):
@@ -109,7 +113,7 @@ def Arms_Control(arms_joint_position):
 	front_arms_angle *= 180 / np.pi
 	back_arms_angle *= 180 / np.pi
 
-def GPS(GPS_data):
+def GPS(GPS_data): # receives data from GPS
 	global x_gps
 	global y_gps
 	global z_gps
@@ -245,7 +249,7 @@ def Orientation_Control(Imu_data):
 	print "left_angle: ", left_angle
 	print '-------------------------'
 	
-def talker():
+def talker(): # inits node and declares subscribers
 	rospy.init_node('Movement_Control', anonymous = True)	
 	rospy.Subscriber('/sensor/gps', NavSatFix, GPS)
 	rospy.Subscriber('/trajectory_parameters', Float32MultiArray, Coordinates_Control)
