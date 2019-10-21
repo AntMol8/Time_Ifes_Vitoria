@@ -74,7 +74,7 @@ def Kinect_Coordinate(data):
                 global_changed = 1
                 
                 
-def GPS(data):
+def GPS(data): #Controls what elements should be removed from goals array by comparing the gps coordinates to the next goal of the robot
         global gps_x, gps_y, global_prossessing, index
         global global_changed, previous_object, x_ref, y_ref
         global return_flag
@@ -138,7 +138,7 @@ def GPS(data):
 	global_prossessing = processing
 	global_changed = changed
 		
-def Fire_Coordinate(data):
+def Fire_Coordinate(data): #receives data from ur5Camera.py and sends info to array goals to start touch routine
 	global goals, gps_y, gps_x, index, global_changed, global_prossessing
 	
 	x_roll = data.data[0]
