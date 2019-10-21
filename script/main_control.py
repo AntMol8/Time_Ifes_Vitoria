@@ -6,40 +6,42 @@ from sensor_msgs.msg import NavSatFix
 
 gps_x, x_ref = 0, 0
 gps_y, y_ref = 0, 0
-#(x,y,speed,frontal, traseiro,braco, recebe dos sensores)
+
+#(x, y, speed, front angle, back angle, braco, recebe dos sensores)
+#list of fixed goals for the robot that are: the corners of the conveyor belts, the stairs and rolls in the beginning of the conveyor belt 
 goals = [(0.0, -2.2, 2, 180, 0, 0, 0, 0), (0.0, -1.2, 0, 180, 0, 1, 0),(-5.7, -2.2, 2, 180, 0, 0, 0),(-8.0, -1.95, 2, 180, 0, 0, 0),(-41.75, -2.01, 2, -45, -45, 0, 1),(-42.32, -2.01, 2, -45, 0, 0, 1),(-42.88, -2.01, 2, 0, 0, 2, 1),(-50.85, -2.01, -2, 0, 0, 2, 1),(-42.72, -2.01, -3, -45, 0, 0, 1),(-41.83, -2.01, -2, 0, -45, 0, 1), (-41.5, -2.01, -2, 0, 0, 0, 1), (-39.4, -2.01, 2, 180, 0, 0, 1),(-42.0, -3.4, 2, 180, 0, 0, 1),(-52.0, -3.4, 2, 0, 0, 0, 0),(-56.0, 0, 2, 0, 0, 0, 0),(-52.0, 3.4, 2, 0, 0, 0, 0),(-42.0, 3.4, 2, 180, 0, 0, 0),(-38.0, 1.85, -2, 180, 0, 0, 1), (-41.6, 1.85, -2, 35, 35, 0, 1), (-42.55, 1.85, -2, 180, 35, 2, 1), (-42.9, 1.85, -2, 180, 0, 2, 1), (-51.0, 1.85, 2, 180, 0, 2, 1), (-43.00, 1.85, 3, 0, 45, 0, 1), (-41.5, 1.85, 2, 180, 0, 0, 1), (-38, 1.85, 2, 180, 0, 0, 0),(-9.0, 1.85, 0, 180, 0, 1, 0), (-6.77, 1.85, 2, 180, 0, 0, 0), (-9.0, 1.85, 0, 180, 0, 1, 0), (-6.31, 1.85, 2, 180, 0, 0, 0), (-3.0, 3.0, 2, 180, 0, 0, 0)] #corrigir a subida de reh
 
-#-6.77, 1.85, 2, 180, 0, 0, 1
 index = len(goals)
 x_master, y_master = 0, 0
-objeto_anterior = 111
-processando_global = 1 #eh false, 1 = 0 mudei para testar a fila
-mudou_global = 1 # 0 = nao mudou
-flag_retorno = 0
+previous_object = 111
+global_prossessing = 1
+global_changed = 1
+return_flag = 0
 speed = 2
 front_angle = 0
 back_angle = 0
 memory = 0
-flug_arm=0
+arm_flag = 0
 
 def Ur5_Feedback(data):
-	global goals, index, processando_global, memory
+	#receives a flag when ur5 finishes the touching routine, so it can remove the top element of the list
+	global goals, index, global_prossessing, memory
 	
         if (data.data == 1 and (memory != data.data)):
         	index -= 1
 		goals.pop(index)
-		processando_global = 0
+		global_prossessing = 0
 		
 	memory = data.data
 	
 def CT_Feedback(data):
-        global flag_retorno
+        global return_flag
 
-	flag_retorno = data.data[0]
+	return_flag = data.data[0]
 
 def Kinect_Coordinate(data): #data.data[0] vai ser um contador de objetos
-        global objeto_anterior, index, processando_global, mudou_global
-        global speed, front_angle, back_angle, flug_arm, gps_x, gps_y
+        global previous_object, index, global_prossessing, global_changed
+        global speed, front_angle, back_angle, arm_flag, gps_x, gps_y
 	msg_l = rospy.Publisher('/main_control_feedback', Float32MultiArray, queue_size = 1)
         pub_l = Float32MultiArray()
         a_l = (1,0)
@@ -52,31 +54,31 @@ def Kinect_Coordinate(data): #data.data[0] vai ser um contador de objetos
                 speed = data.data[3]
                 front_angle = data.data[4]
                 back_angle = data.data[5]
-                flug_arm = data.data[6]
+                arm_flag = data.data[6]
 		if(gps_y>0):
-			goals.insert(index, (x_objeto-2.5, 1.85, speed, front_angle, back_angle, flug_arm, data.data[7]))
-			goals.insert(index+1, (x_objeto-1.0, y_objeto, speed, front_angle, back_angle, flug_arm, data.data[7]))
+			goals.insert(index, (x_objeto-2.5, 1.85, speed, front_angle, back_angle, arm_flag, data.data[7]))
+			goals.insert(index+1, (x_objeto-1.0, y_objeto, speed, front_angle, back_angle, arm_flag, data.data[7]))
 		else:
-			goals.insert(index, (x_objeto+1.5, 1.95, speed, front_angle, back_angle, flug_arm, data.data[7]))
-			goals.insert(index+1, (x_objeto+0.5, y_objeto, speed, front_angle, back_angle, flug_arm, data.data[7]))
-                goals.insert(index+2, (x_objeto, y_objeto, speed, front_angle, back_angle, flug_arm, data.data[7]))
+			goals.insert(index, (x_objeto+1.5, 1.95, speed, front_angle, back_angle, arm_flag, data.data[7]))
+			goals.insert(index+1, (x_objeto+0.5, y_objeto, speed, front_angle, back_angle, arm_flag, data.data[7]))
+                goals.insert(index+2, (x_objeto, y_objeto, speed, front_angle, back_angle, arm_flag, data.data[7]))
 		
                 index += 3
-                processando_global = 0
-                objeto_anterior = data.data[0]
-                mudou_global = 1
+                global_prossessing = 0
+                previous_object = data.data[0]
+                global_changed = 1
                 
                 
 def GPS(data):
-        global gps_x, gps_y, processando_global, index
-        global mudou_global, objeto_anterior, x_ref, y_ref
-        global flag_retorno
+        global gps_x, gps_y, global_prossessing, index
+        global global_changed, previous_object, x_ref, y_ref
+        global return_flag
         global speed, front_angle, back_angle
-	mudou = mudou_global
-	processando = processando_global
+	mudou = global_changed
+	processando = global_prossessing
 	gps_x = data.latitude
 	gps_y = data.longitude
-	flag_retorno = 0
+	return_flag = 0
 	flag_parar = 0
 	if(gps_y<0 and gps_x>-51.5 and goals[index - 1][0]<-51.5): #aparentemente foi resolvido, adicionar o opcao na condicao abaixo que corrige todos os problemas
 		index -= 1
@@ -126,27 +128,27 @@ def GPS(data):
                         front_angle = goals[index-1][3]
                         back_angle = goals[index-1][4]
                 
-                a_l = (objeto_anterior, flag_parar, x_ref, y_ref, speed, front_angle, back_angle)
+                a_l = (previous_object, flag_parar, x_ref, y_ref, speed, front_angle, back_angle)
                 pub_l.data = a_l
 
-                while (flag_retorno != 1 and len(goals) != 0):
+                while (return_flag != 1 and len(goals) != 0):
                 	print "cpmo: recebendo retorno do lacaio", x_ref, y_ref
 	                msg_l.publish(pub_l)
                         
-	        flag_retorno = 0
+	        return_flag = 0
                 mudou = 0
                 processando = 1
-	processando_global = processando
-	mudou_global = mudou
+	global_prossessing = processando
+	global_changed = mudou
 		
 def Fire_Coordinate(data):
-	global goals, gps_y, gps_x, index, mudou_global, processando_global
+	global goals, gps_y, gps_x, index, global_changed, global_prossessing
 	x_rolo = data.data[0]
 	goals.insert(index, (gps_x + 1, gps_y + 1, 0, 180, 0, 1, 1))
 	index += 1
-        processando_global = 0
-        objeto_anterior = data.data[0]
-        mudou_global = 1
+        global_prossessing = 0
+        previous_object = data.data[0]
+        global_changed = 1
 
 def talker():
 	rospy.init_node('Main_Control', anonymous = True)
