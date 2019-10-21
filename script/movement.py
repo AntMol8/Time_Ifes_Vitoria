@@ -88,8 +88,8 @@ def Arms_Control(arms_joint_position):
 		
 	front_arms_angle *= np.pi / 180
 	back_arms_angle *= np.pi / 180
-	ang_ref1, ang_ref3 = front_arms_angle, -ang_ref1 		
-	ang_ref2, ang_ref4 = back_arms_angle, -ang_ref2 		
+	ang_ref1, ang_ref3 = front_arms_angle, -front_arms_angle 		
+	ang_ref2, ang_ref4 = back_arms_angle, -back_arms_angle		
 
 	#calculates the difference between the ideal position and the actual position of the arms and amplifies it
 	error1 = (right_front_arm-ang_ref1) * 10
