@@ -18,6 +18,7 @@ front_angle = 0
 back_angle = 0
 
 def Main_Control_Parameters(data):
+	#receives information from its subscriber
 	global gps_x_ref, gps_y_ref
 	global gps_x, gps_y, speed, front_angle, back_angle
 	global object_x, object_y, core_flag
@@ -35,12 +36,11 @@ def Main_Control_Parameters(data):
 	
 	slave_msg = rospy.Publisher('/create_trajectory_feedback', Float32MultiArray, queue_size = 1)
 	slave_publication = Float32MultiArray()
-	print 'create_trajectory: recebeu do main_control'
-	print 'create_trajectory: x: ', data.data[2], 'y: ', data.data[3]
 	slave_publication.data = (1, 0)
 	slave_msg.publish(slave_publication)
 	
-def GPS(data): #para o calculo da orientacao tem que saber a orientacao
+def GPS(data):
+	#uses the robots coordinates to determine the parameters of the hyberbolic tangent
 	global object_x, object_y, speed, front_angle, back_angle
 	global gps_x_ref, gps_y_ref
 	global orientation, core_flag
@@ -53,12 +53,12 @@ def GPS(data): #para o calculo da orientacao tem que saber a orientacao
 
 	if (abs(delta_x) > 0.3):
 		#b is a constant used in the hyberbolic tangent
-		b = 2.646652412 / (delta_x/np.absolute(delta_x)*np.absolute(abs(delta_x)-0.3)/2) #0.3 eh para dar uma margem de seguranca
+		b = 2.646652412 / (delta_x/np.absolute(delta_x)*np.absolute(abs(delta_x)-0.3)/2)
 	else:
 		b = 2.646652412 / (delta_x/np.absolute(delta_x)*np.absolute(abs(delta_x))/2)
         
 	if (delta_x < 0):
-		orientation = 1 #manda no canal de comunicacao com o mestre
+		orientation = 1
 	else:
 		orientation = -1
                 
@@ -69,7 +69,6 @@ def GPS(data): #para o calculo da orientacao tem que saber a orientacao
 	pub.data = (stop_flag, resolution, amplitude, b, speed, front_angle, back_angle, gps_x_ref, gps_y_ref)
 
 	if (core_flag != 0):
-		print 'create_trajectory: mandou para trajectory_parameters'
 		msg.publish(pub)
         
 	core_flag = 0
