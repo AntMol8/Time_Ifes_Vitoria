@@ -81,7 +81,7 @@ def GPS(data): #Controls what elements should be removed from goals array by com
         global speed, front_angle, back_angle
 	mudou = global_changed
 	
-	processando = global_prossessing
+	processing = global_prossessing
 	gps_x = data.latitude
 	gps_y = data.longitude
 	return_flag = 0
