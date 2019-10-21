@@ -8,34 +8,51 @@ from std_msgs.msg import Float32MultiArray
 from PIL import Image as IMG
 
 #Variable declaration
+# x, y and z data from the Hokuyo
 data_x = []
 data_y = []
 data_z = []
-pos_x, pos_y, pos_z, x, y = 0.0, 0.0, 0.0, 0.0, 0.0
+# variables that hold the GPS coordinates
+pos_x, pos_y = 0.0, 0.0
+# holds the last output from the Hokuyo
 memory = ()
+# indicates that the beggining or the end of the roll has been identified
 roll = False
+
+# holds the coordinates of all the previous rolls
 previous_roll_x =  []
 previous_roll_y = []
+
+# rolls are published in groups of 4 coordinates: (x coordinate - first edge of the roll, y coordinate - first edge of the roll, x coordinate - second edge of the roll, y coordinate - second edge of the roll)
+# n makes sure that there are 4 coordinates before they are sent
 n = 0
+
+# temporarily holds the values of the beggining and end of a roll before they are published
 coordinates = []
+
+# checks if program should look for beggining or end of the roll
 condition = 0
+
+#marks the gps position at the moment the first edge of a roll is detected
 mark_spot = 100
 
-def pathfinder():
+def pathfinder(): # iits node; inits Hokuyo and GPS subscriber; inits publisher that sends roll coordinates
 	global pub
 	global flag
 
-	#Inits node and declares subscribers
+	# iits node and declares subscribers
 	rospy.init_node('DETECT_ROLL', anonymous = True)
 	rospy.Subscriber('/sensor/gps', NavSatFix, position)
 	rospy.Subscriber('/sensor/hokuyo', HokuyoReading, callback)
-	rospy.Subscriber('/armBrain', Int8, fix_touch)
+	
+	# flag publisher sends rolls coordinates to be printed on a map
 	flag = rospy.Publisher('/detect_roll', Float32MultiArray, queue_size=1)
 	pub = Float32MultiArray()
 	pub.data = 0
 	rospy.spin()
 
-def position(GPS_data):
+def position(GPS_data): #receives data from GPS. Controls the publishing of roll coordinates
+	
 	global n
 	global previous_roll_x
 	global previous_roll_y
@@ -106,8 +123,6 @@ def callback(Hokuyo_data):
 	global data_z
 	global pos_x
 	global pos_y
-	global k
-	global check_status
 	global flag
 	global memory
 	global pub
