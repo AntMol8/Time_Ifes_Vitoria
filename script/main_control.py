@@ -35,19 +35,22 @@ def Ur5_Feedback(data):
 	memory = data.data
 	
 def CT_Feedback(data):
+	#receives create_trajectory feedback so it can stop publishing information to it
         global return_flag
 
 	return_flag = data.data[0]
 
-def Kinect_Coordinate(data): #data.data[0] vai ser um contador de objetos
+def Kinect_Coordinate(data):
+	#receives the coordinates from object_control and puts it in the list of goals
         global previous_object, index, global_prossessing, global_changed
         global speed, front_angle, back_angle, arm_flag, gps_x, gps_y
+	
 	msg_l = rospy.Publisher('/main_control_feedback', Float32MultiArray, queue_size = 1)
         pub_l = Float32MultiArray()
-        a_l = (1,0)
-        pub_l.data = a_l
+        pub_l.data = (1,0)
         msg_l.publish(pub_l)
-        if ( (goals[index - 1][0] != data.data[1] or goals[index - 1][1] != data.data[2]) and goals[index - 1][6] !=1): #analisar se isso eh generalizado
+	
+        if ((goals[index - 1][0] != data.data[1] or goals[index - 1][1] != data.data[2]) and goals[index - 1][6] !=1):
 		print 'cpmo: adicionado do cpo na fila'
                 x_objeto = data.data[1]
                 y_objeto = data.data[2]
@@ -55,13 +58,15 @@ def Kinect_Coordinate(data): #data.data[0] vai ser um contador de objetos
                 front_angle = data.data[4]
                 back_angle = data.data[5]
                 arm_flag = data.data[6]
-		if(gps_y>0):
-			goals.insert(index, (x_objeto-2.5, 1.85, speed, front_angle, back_angle, arm_flag, data.data[7]))
-			goals.insert(index+1, (x_objeto-1.0, y_objeto, speed, front_angle, back_angle, arm_flag, data.data[7]))
+		
+		if (gps_y > 0):
+			goals.insert(index, (x_objeto - 2.5, 1.85, speed, front_angle, back_angle, arm_flag, data.data[7]))
+			goals.insert(index + 1, (x_objeto - 1.0, y_objeto, speed, front_angle, back_angle, arm_flag, data.data[7]))
 		else:
-			goals.insert(index, (x_objeto+1.5, 1.95, speed, front_angle, back_angle, arm_flag, data.data[7]))
-			goals.insert(index+1, (x_objeto+0.5, y_objeto, speed, front_angle, back_angle, arm_flag, data.data[7]))
-                goals.insert(index+2, (x_objeto, y_objeto, speed, front_angle, back_angle, arm_flag, data.data[7]))
+			goals.insert(index, (x_objeto + 1.5, 1.95, speed, front_angle, back_angle, arm_flag, data.data[7]))
+			goals.insert(index + 1, (x_objeto + 0.5, y_objeto, speed, front_angle, back_angle, arm_flag, data.data[7]))
+			
+                goals.insert(index + 2, (x_objeto, y_objeto, speed, front_angle, back_angle, arm_flag, data.data[7]))
 		
                 index += 3
                 global_prossessing = 0
@@ -75,48 +80,39 @@ def GPS(data):
         global return_flag
         global speed, front_angle, back_angle
 	mudou = global_changed
+	
 	processando = global_prossessing
 	gps_x = data.latitude
 	gps_y = data.longitude
 	return_flag = 0
-	flag_parar = 0
-	if(gps_y<0 and gps_x>-51.5 and goals[index - 1][0]<-51.5): #aparentemente foi resolvido, adicionar o opcao na condicao abaixo que corrige todos os problemas
-		index -= 1
-		goals.pop(index)
-		processando = 0
+	stop_flag = 0
 	
-	'''if(index==7 and gps_x>-14.0):
+	if (gps_y < 0 and gps_x > -51.5 and goals[index - 1][0] < -51.5):
 		index -= 1
 		goals.pop(index)
-		processando = 0'''
+		processing = 0
 	
 	if (len(goals) != 0):
 		flug = rospy.Publisher('/armBrain', Int8, queue_size = 1)
 		flug.publish(goals[index - 1][5])
 		
-		if (processando == 1 and np.absolute(goals[index - 1][0] - gps_x) < 0.05) and (np.absolute(goals[index-1][1] - gps_y) < 0.05):
+		if (processing == 1 and np.absolute(goals[index - 1][0] - gps_x) < 0.05) and (np.absolute(goals[index-1][1] - gps_y) < 0.05):
 		        index -= 1
 		        goals.pop(index)
-		        processando = 0
+		        processing = 0
 
-	if (processando == 0):
+	if (processing == 0):
                 if (len(goals) != 0):
-                        processando = 1
-                        mudou = 1
+                        processing = 1
+                        changed = 1
                 else:
-                        #msg_a = rospy.Publisher('/canaldoarauto', Float32MultiArray, queue_size = 1)
-                        #pub_a = Float32MultiArray()
-                        #finalizado = 1
-                        #a_a = (finalizado)
-                        #pub_a.data = a_a
-                        #msg_a.publish(pub_a)
-                        flag_parar = 1
-                        mudou = 1
+                        stop_flag = 1
+                        changed = 1
 
         print 'cpmo:' , goals[index-1]
 	print 'cpmo: ', index, len(goals)
           
-        if (mudou == 1):     #precisa de um flag para quando for subir a escada
+        if (changed == 1):
                 msg_l = rospy.Publisher('/main_control', Float32MultiArray, queue_size = 1)
                 pub_l = Float32MultiArray()
                 print 'cpmo: mandou para o lacaio', x_ref, y_ref
@@ -136,14 +132,16 @@ def GPS(data):
 	                msg_l.publish(pub_l)
                         
 	        return_flag = 0
-                mudou = 0
-                processando = 1
-	global_prossessing = processando
-	global_changed = mudou
+                changed = 0
+                processing = 1
+		
+	global_prossessing = processing
+	global_changed = changed
 		
 def Fire_Coordinate(data):
 	global goals, gps_y, gps_x, index, global_changed, global_prossessing
-	x_rolo = data.data[0]
+	
+	x_roll = data.data[0]
 	goals.insert(index, (gps_x + 1, gps_y + 1, 0, 180, 0, 1, 1))
 	index += 1
         global_prossessing = 0
