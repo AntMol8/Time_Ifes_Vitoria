@@ -15,6 +15,7 @@ index = len(goals)
 x_master, y_master = 0, 0
 previous_object = 111
 global_prossessing = 1
+stop_flag = 0
 global_changed = 1
 return_flag = 0
 speed = 2
@@ -77,9 +78,9 @@ def Kinect_Coordinate(data):
 def GPS(data): #Controls what elements should be removed from goals array by comparing the gps coordinates to the next goal of the robot
         global gps_x, gps_y, global_prossessing, index
         global global_changed, previous_object, x_ref, y_ref
-        global return_flag
+        global return_flag, stop_flag
         global speed, front_angle, back_angle
-	mudou = global_changed
+	changed = global_changed
 	
 	processing = global_prossessing
 	gps_x = data.latitude
