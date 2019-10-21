@@ -39,9 +39,9 @@ def Trajectory_Parameters(data):
 		x_ref = gps_x_ref + resolution
 		arg = -b * (x_ref+constant-gps_x_ref)
 		y_ref = math.tanh(arg) + 0
-        y_ref = amplitude * (y_ref+1)
-        y_ref += gps_y_ref
-        print 'trajectory_parameters: recebeu do create_trajectory'
+        	y_ref = amplitude * (y_ref+1)
+        	y_ref += gps_y_ref
+        	print 'trajectory_parameters: recebeu do create_trajectory'
 
 def GPS(data):
 	global resolution
