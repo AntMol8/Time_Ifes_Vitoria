@@ -8,12 +8,8 @@ from rosi_defy.msg import HokuyoReading
 from std_msgs.msg import Float32MultiArray
 import cv2
 
-#Variable declaration
-data_x = 10
-data_y = 10
-pos_x, pos_y, pos_z, x, y = 0.0, 0.0, 0.0, 0.0, 0.0
-memory = ()
-fire = 0		#flag that represents if the camera has found fire or not
+pos_x, pos_y, pos_z = 0.0, 0.0, 0.0, 0.0, 0.0
+fire = 0					#flag that represents if the camera has found fire or not
 previous_fires_x = []
 previous_fires_y = []
 	
@@ -23,14 +19,15 @@ upper = np.array([50, 255, 255])
 def position(GPS_data):
 	global previous_fires_x
 	global previous_fires_y
-	global fire
-	#Receives coordinates x and y from the gps
+	global fire				#Receives coordinates x and y from the gps
 	global pos_x
 	global pos_y
+	global pos_z
 
 	pos_x = GPS_data.latitude
 	pos_y = GPS_data.longitude
-
+	pos_z = GPS_data.altitude
+	
 	if (fire == 1):
 			#parametrization of the position of the fire in the y axis based on which side of the conveyor belt the robot is
 	        if (pos_y > 1):
