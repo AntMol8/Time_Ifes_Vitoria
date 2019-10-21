@@ -37,17 +37,19 @@ def Detect_Roll(data):
 	if ((gps_map[x_roll_1, y_roll_1] == (0, 0, 255)).all() or (gps_map[x_roll_2, y_roll_1] == (0, 0, 255)).all() or (gps_map[x_roll_1, y_roll_2] == (0, 0, 255)).all() or (gps_map[x_roll_2, y_roll_2] == (0, 0, 255)).all()):
 		return
 		
-	cv2.rectangle(gps_map, y_roll_1, x_roll_1, y_roll_2 + 5, x_roll_2 - 5, (0, 255, 0), -1)
+	cv2.rectangle(gps_map, (int(data.data[1]/resolution) + 600 - 5, int(data.data[0]/resolution) + 6000 - 5), (int(data.data[3]/resolution) + 600 + 5, int(data.data[2]/resolution) + 6000 + 5), (0, 255, 0), -1)
 	
 def Detect_Fire(data):
 	global gps_map, resolution
-	
+
 	if (y_gps > 1):
-	                data.data[0] += 0.136
-        elif (y_gps < -1):
-	        	data.data[0] -= 0.136
-			
-	x_roll = data.data[0]
+		a = data.data[0] + 0.136
+	elif (y_gps < -1):
+		a = data.data[0] - 0.136
+	else:
+		a = data.data[0]
+
+	x_roll = a
 	y_roll = data.data[1]
 
 	cv2.rectangle(gps_map, (int(y_roll / resolution) + 600 - 5, int(x_roll / resolution) + 6000 - 5), (int(y_roll / resolution) + 600 + 5, int(x_roll / resolution) + 6000 + 5), (0, 0, 255), -1)
