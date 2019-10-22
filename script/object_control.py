@@ -66,7 +66,7 @@ def GPS(data):
 	gps_y = data.longitude
 	print 'cpo: gps', objeto,"desvio: ", flag_desvio, "volta: ", flag_volta, "x: ", gps_x
 	print 'x_velodyne: ', x_velodyne, 'x_kinect: ', x_kinect
-	if((-6.31>gps_x>-51.0)):
+	if((-6.31>gps_x>-41.0)):
 		if(objeto!=1):
 			if(flag_desvio==0 and flag_volta == 0):
 				msg_l = rospy.Publisher('/OBC_OBV', Float32MultiArray, queue_size = 1) 
